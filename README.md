@@ -61,7 +61,10 @@ npm run generate
   - `src/index.ts`: 서버 엔트리 포인트(실행 시작점)
   - `src/app.ts`: Express 앱 생성(미들웨어/라우터 등록)
   - `src/env.ts`: 환경변수 로딩/검증(zod)
-  - `src/docs/swagger.ts`: Swagger(OpenAPI) 스펙 생성 및 UI 라우터
+  - `src/routes/`: 라우팅(엔드포인트) 정의
+  - `src/controllers/`: 요청/응답 처리(컨트롤러)
+  - `src/services/`: 비즈니스 로직
+  - `src/models/`: 도메인/모델/스키마(필요 시)
 - `prisma/`: Prisma 스키마
   - `prisma/schema.prisma`: DB 모델 정의(변경 시 `npx prisma generate` 권장)
 - `docs/`: 문서

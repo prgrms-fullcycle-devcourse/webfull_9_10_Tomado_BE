@@ -19,8 +19,6 @@
 
 - Node.js 20+
 - npm
-- Docker Desktop (또는 Docker Engine + Compose v2)
-- macOS/Linux 기준으로 작성됨 (Windows는 WSL 권장)
 
 ### 0) 의존성 설치
 
@@ -37,39 +35,6 @@ cp env/example.env env/local.env
 필요 시 `env/local.env` 값을 수정하세요.
 
 - **Supabase 사용 시**: `DATABASE_URL`에 Supabase Postgres 연결 문자열을 넣습니다.
-- **로컬 Postgres 사용 시**: 기본값(`localhost:5432`) 그대로 사용하고 `make up`으로 띄우면 됩니다.
-
-### 2) 인프라(Postgres/Redis) 실행
-
-```bash
-make up
-make ps
-```
-
-로그 확인:
-
-```bash
-make logs
-```
-
-종료:
-
-```bash
-make down
-```
-
-### 3) DB UI(선택)
-
-Adminer를 띄웁니다:
-
-```bash
-make tools
-```
-
-- 접속: `http://localhost:${ADMINER_PORT}` (기본 8080)
-- System: `PostgreSQL`
-- Server: `postgres`
-- Username/Password/Database: `env/local.env` 값 사용
 
 ---
 
@@ -104,7 +69,6 @@ npm run generate
 - `env/`: 환경변수 템플릿
   - `env/example.env`: 팀 공통 기본값 템플릿
   - `env/local.env`: 개인 로컬 설정(커밋 금지)
-- `docker-compose.yml`: 로컬 개발용 인프라(Postgres/Redis)
 
 ---
 
@@ -144,7 +108,3 @@ npm run generate
 - 인증(JWT), 에러 핸들링, 로깅(pino) 표준 미들웨어 추가
 - 테스트(Jest/Vitest) 및 CI 구성
 - OpenAPI 파일(`docs/api/openapi.yaml`)을 기준으로 스펙/코드 동기화 규칙 확정
-
-- OpenAPI 파일(`docs/api/openapi.yaml`)로의 전환/동기화 규칙 확정
-- 라우팅/에러 핸들링/로깅(pino)/인증(JWT) 표준 미들웨어 추가
-- 테스트(Jest/Vitest) 도입 및 CI 구성

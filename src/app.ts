@@ -1,7 +1,8 @@
 import cors from 'cors';
 import express from 'express';
 
-import { swaggerRouter } from './docs/swagger.js';
+import { healthRouter } from './routes/health.route.js';
+import { swaggerRouter } from './routes/swagger.route.js';
 
 export function createApp() {
   const app = express();
@@ -9,11 +10,8 @@ export function createApp() {
   app.use(cors());
   app.use(express.json());
 
-  app.get('/health', (_req, res) => {
-    res.json({ ok: true });
-  });
-
-  app.use('/docs', swaggerRouter);
+  app.use(healthRouter);
+  app.use(swaggerRouter);
 
   return app;
 }

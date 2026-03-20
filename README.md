@@ -64,7 +64,7 @@ npm run generate
   - `src/routes/`: 라우팅(엔드포인트) 정의
   - `src/controllers/`: 요청/응답 처리(컨트롤러)
   - `src/services/`: 비즈니스 로직
-  - `src/models/`: 도메인/모델/스키마(필요 시)
+  - `src/repositories/`: DB 접근(Repository) 및 영속성 계층
 - `prisma/`: Prisma 스키마
   - `prisma/schema.prisma`: DB 모델 정의(변경 시 `npx prisma generate` 권장)
 - `docs/`: 문서

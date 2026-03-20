@@ -55,23 +55,34 @@ npm run dev
 npm run generate
 ```
 
+### DB(Supabase Postgres) 연동 흐름
+
+- **1) Supabase에서 Connection string 확인**
+    - Supabase 프로젝트 → Database → Connection string(또는 Settings)에서 Postgres URI를 복사
+- **2) `env/local.env`에 `DATABASE_URL` 설정**
+    - `env/example.env`를 복사해 `env/local.env`를 만들고, `DATABASE_URL`을 Supabase 값으로 교체
+- **3) Prisma Client 생성**
+    - `npm run generate`
+- **4) 연결 확인(예시)**
+    - 서버 실행 후 `GET /examples` 호출 시 DB에서 `Example` 모델을 조회합니다.
+
 ## 폴더/파일 컨벤션
 
 - `src/`: Express 서버 코드
-  - `src/index.ts`: 서버 엔트리 포인트(실행 시작점)
-  - `src/app.ts`: Express 앱 생성(미들웨어/라우터 등록)
-  - `src/env.ts`: 환경변수 로딩/검증(zod)
-  - `src/routes/`: 라우팅(엔드포인트) 정의
-  - `src/controllers/`: 요청/응답 처리(컨트롤러)
-  - `src/services/`: 비즈니스 로직
-  - `src/repositories/`: DB 접근(Repository) 및 영속성 계층
+    - `src/index.ts`: 서버 엔트리 포인트(실행 시작점)
+    - `src/app.ts`: Express 앱 생성(미들웨어/라우터 등록)
+    - `src/env.ts`: 환경변수 로딩/검증(zod)
+    - `src/routes/`: 라우팅(엔드포인트) 정의
+    - `src/controllers/`: 요청/응답 처리(컨트롤러)
+    - `src/services/`: 비즈니스 로직
+    - `src/repositories/`: DB 접근(Repository) 및 영속성 계층
 - `prisma/`: Prisma 스키마
-  - `prisma/schema.prisma`: DB 모델 정의(변경 시 `npx prisma generate` 권장)
+    - `prisma/schema.prisma`: DB 모델 정의(변경 시 `npx prisma generate` 권장)
 - `docs/`: 문서
-  - `docs/api/README.md`: API 명세 운영(초안/동기화 전략) 가이드
+    - `docs/api/README.md`: API 명세 운영(초안/동기화 전략) 가이드
 - `env/`: 환경변수 템플릿
-  - `env/example.env`: 팀 공통 기본값 템플릿
-  - `env/local.env`: 개인 로컬 설정(커밋 금지)
+    - `env/example.env`: 팀 공통 기본값 템플릿
+    - `env/local.env`: 개인 로컬 설정(커밋 금지)
 
 ---
 
@@ -82,8 +93,8 @@ npm run generate
 - **접속**: `GET /docs`
 - **역할**: REST API를 **자동 문서화**하고, 개발 중에 **요청/응답을 빠르게 확인**하는 용도입니다.
 - **관리 위치**: 현재는 `src/docs/swagger.ts`에서 기본 스펙을 생성하고, 향후에는
-  - 코드 주석 기반(JSDoc)으로 스펙을 확장하거나,
-  - `docs/api/openapi.yaml`을 소스 오브 트루스로 두고 서버에서 서빙하는 방식으로 전환할 수 있습니다.
+    - 코드 주석 기반(JSDoc)으로 스펙을 확장하거나,
+    - `docs/api/openapi.yaml`을 소스 오브 트루스로 두고 서버에서 서빙하는 방식으로 전환할 수 있습니다.
 
 ### API 명세(팀 합의 문서)
 
@@ -94,15 +105,15 @@ npm run generate
 
 - `env/example.env`는 **팀 공통 템플릿**이고, `env/local.env`는 **개인 로컬 값**입니다.
 - 필수 키:
-  - `DATABASE_URL`: Supabase(Postgres) 또는 로컬 Postgres 연결 문자열
-  - `PORT`: 서버 포트
+    - `DATABASE_URL`: Supabase(Postgres) 또는 로컬 Postgres 연결 문자열
+    - `PORT`: 서버 포트
 
 ### 코드 품질(ESLint/Prettier) & 커밋 훅
 
 - `npm run lint`: 코드 규칙 검사(잠재 버그/안티패턴 방지)
 - `npm run format`: 포맷 자동 정리(팀 스타일 통일)
 - Husky + lint-staged:
-  - 커밋 시 변경된 파일만 Prettier 포맷을 자동 적용합니다.
+    - 커밋 시 변경된 파일만 Prettier 포맷을 자동 적용합니다.
 
 ---
 

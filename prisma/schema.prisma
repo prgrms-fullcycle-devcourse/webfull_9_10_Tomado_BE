@@ -7,9 +7,126 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-// TODO: 실제 도메인 모델로 교체
-model Example {
-  id        String   @id @default(cuid())
-  createdAt DateTime @default(now())
+// 1. 유저 정보
+model User {
+  id         String   @id @default(uuid()) @db.Uuid
+  loginId    String   @unique @map("login_id")
+  nickname   String?
+  avatarUrl  String?  @map("avatar_url")
+  createdAt  DateTime @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt  DateTime @updatedAt @map("updated_at") @db.Timestamptz
+
+  // 관계: 한 유저는 여러 데이터를 가짐
+  settings   UserSetting?
+  todos      Todo[]
+  sessions   PomodoroSession[]
+  dailyLogs  DailyLog[]
+  retroLogs  RetroLog[]
+  stats      DailyFocusStat[]
+
+  @@map("users") // 실제 DB 테이블 이름
 }
 
+// 2. 유저 개인 설정 (1:1 관계)
+model UserSetting {
+  id              String   @id @default(uuid()) @db.Uuid
+  userId          String   @unique @map("user_id") @db.Uuid
+  focusMin        Int      @default(25) @map("focus_min")
+  shortBreakMin   Int      @default(5) @map("short_break_min")
+  longBreakMin    Int      @default(20) @map("long_break_min")
+  sessionsPerSet  Int      @default(4) @map("sessions_per_set")
+  autoCarryTodo   Boolean  @default(true) @map("auto_carry_todo")
+  updatedAt       DateTime @updatedAt @map("updated_at") @db.Timestamptz
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("user_settings")
+}
+
+// 3. 할 일 (Todo - 1:N 관계)
+model Todo {
+  id           String    @id @default(uuid()) @db.Uuid
+  userId       String    @map("user_id") @db.Uuid
+  title        String
+  description  String?
+  assignedDate DateTime  @map("assigned_date") @db.Date
+  sortOrder    Float     @map("sort_order")
+  completedAt  DateTime? @map("completed_at") @db.Timestamptz
+  createdAt    DateTime  @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt    DateTime  @updatedAt @map("updated_at") @db.Timestamptz
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("todos")
+}
+
+// 4. 뽀모도로 세션 기록
+model PomodoroSession {
+  id          String    @id @default(uuid()) @db.Uuid
+  userId      String    @map("user_id") @db.Uuid
+  type        String
+  status      String
+  actualSec   Int       @map("actual_sec")
+  focusDate   DateTime  @map("focus_date") @db.Date
+  startedAt   DateTime  @map("started_at") @db.Timestamptz
+  endedAt     DateTime? @map("ended_at") @db.Timestamptz
+  createdAt   DateTime  @default(now()) @map("created_at") @db.Timestamptz
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("pomodoro_sessions")
+}
+
+// 5. 일일 로그
+model DailyLog {
+  id           String    @id @default(uuid()) @db.Uuid
+  userId       String    @map("user_id") @db.Uuid
+  logDate      DateTime  @map("log_date") @db.Date
+  content      String?
+  tags         String[]  @default([])
+  isDirty      Boolean   @default(false) @map("is_dirty")
+  draftContent String?   @map("draft_content")
+  createdAt    DateTime  @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt    DateTime  @updatedAt @map("updated_at") @db.Timestamptz
+
+  user      User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  retroLogs RetroLog[]
+
+  @@map("daily_logs")
+}
+
+// 6. 회고 로그 (Retro)
+model RetroLog {
+  id           String   @id @default(uuid()) @db.Uuid
+  userId       String   @map("user_id") @db.Uuid
+  dailyLogId   String?  @map("daily_log_id") @db.Uuid
+  retroDate    DateTime @map("retro_date") @db.Date
+  templateType String   @map("template_type")
+  content      Json
+  isDirty      Boolean  @default(false) @map("is_dirty")
+  draftContent Json?    @map("draft_content")
+  createdAt    DateTime @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt    DateTime @updatedAt @map("updated_at") @db.Timestamptz
+
+  user     User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  dailyLog DailyLog? @relation(fields: [dailyLogId], references: [id])
+
+  @@map("retro_logs")
+}
+
+// 7. 일일 집중 통계
+model DailyFocusStat {
+  id                String   @id @default(uuid()) @db.Uuid
+  userId            String   @map("user_id") @db.Uuid
+  focusDate         DateTime @map("focus_date") @db.Date
+  totalFocusSec     Int      @default(0) @map("total_focus_sec")
+  completedSessions Int      @default(0) @map("completed_sessions")
+  completedTodos    Int      @default(0) @map("completed_todos")
+  hasDailyLog       Boolean  @default(false) @map("has_daily_log")
+  hasRetroLog       Boolean  @default(false) @map("has_retro_log")
+  updatedAt         DateTime @updatedAt @map("updated_at") @db.Timestamptz
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("daily_focus_stats")
+}

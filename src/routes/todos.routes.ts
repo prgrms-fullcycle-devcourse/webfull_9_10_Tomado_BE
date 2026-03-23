@@ -1,9 +1,9 @@
 import { Router } from 'express';
-import { authMiddleware } from '../middlewares/auth.middleware.js';
+import { requireAuth } from './middleware/auth.middleware.js';
 import * as todosController from '../controllers/todos.controller.js';
 
 const router = Router();
-router.use(authMiddleware);
+router.use(requireAuth);
 router.get('/', todosController.getTodos);
 router.post('/', todosController.createTodo);
 router.delete('/:id', todosController.deleteTodo);

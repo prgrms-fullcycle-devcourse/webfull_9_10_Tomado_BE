@@ -15,7 +15,7 @@ export const getTodos = async (req: Request, res: Response, next: NextFunction) 
             });
         }
 
-        const todos = await todosService.getTodos((req as any).user.id, date);
+        const todos = await todosService.getTodos(res.locals.authUserId as string, date);
         res.status(200).json(todos);
     } catch (err) {
         next(err);
@@ -46,7 +46,7 @@ export const createTodo = async (req: Request, res: Response, next: NextFunction
             });
         }
 
-        const todo = await todosService.createTodo((req as any).user.id, {
+        const todo = await todosService.createTodo(res.locals.authUserId as string, {
             title,
             description,
             assigned_date,
@@ -61,7 +61,7 @@ export const createTodo = async (req: Request, res: Response, next: NextFunction
 export const deleteTodo = async (req: Request, res: Response, next: NextFunction) => {
     try {
         const id = req.params.id as string;
-        await todosService.deleteTodo((req as any).user.id, id);
+        await todosService.deleteTodo(res.locals.authUserId as string, id);
         res.status(204).send();
     } catch (err: any) {
         const statusMap: Record<string, number> = {
@@ -77,7 +77,7 @@ export const deleteTodo = async (req: Request, res: Response, next: NextFunction
 export const updateTodo = async (req: Request, res: Response, next: NextFunction) => {
     try {
         const { title, description, assigned_date } = req.body;
-        const todo = await todosService.updateTodo((req as any).user.id, req.params.id as string, {
+        const todo = await todosService.updateTodo(res.locals.authUserId as string, req.params.id as string, {
             title,
             description,
             assigned_date,
@@ -107,7 +107,11 @@ export const toggleComplete = async (req: Request, res: Response, next: NextFunc
             });
         }
 
-        const todo = await todosService.toggleComplete((req as any).user.id, req.params.id as string, completed);
+        const todo = await todosService.toggleComplete(
+            res.locals.authUserId as string,
+            req.params.id as string,
+            completed
+        );
         res.status(200).json(todo);
     } catch (err: any) {
         const statusMap: Record<string, number> = {
@@ -123,7 +127,7 @@ export const reorderTodo = async (req: Request, res: Response, next: NextFunctio
     try {
         const { prev_order, next_order } = req.body;
         const todo = await todosService.reorderTodo(
-            (req as any).user.id,
+            res.locals.authUserId as string,
             req.params.id as string,
             prev_order ?? null,
             next_order ?? null

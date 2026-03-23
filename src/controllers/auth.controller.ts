@@ -63,7 +63,12 @@ export async function refresh(req: Request, res: Response) {
 
 export async function logout(req: Request, res: Response) {
     try {
-        const result = authService.logout(req.headers.authorization);
+        const accessToken = res.locals.authAccessToken as string | undefined;
+        if (accessToken == null) {
+            sendAuthError(res, new AuthHttpError(401, 'UNAUTHORIZED', '유효하지 않거나 만료된 Access Token입니다.'));
+            return;
+        }
+        const result = await authService.logout(accessToken);
         res.status(result.status).end();
     } catch (e) {
         if (e instanceof AuthHttpError) {

@@ -67,3 +67,19 @@ export const updateTodo = async (
         },
     });
 };
+
+// todo 완료 토글
+export const toggleTodoComplete = async (id: string, completed: boolean): Promise<Todo> => {
+    return await prisma.todo.update({
+        where: { id },
+        data: { completedAt: completed ? new Date() : null },
+    });
+};
+
+// todo 순서 변경
+export const reorderTodo = async (id: string, sortOrder: number): Promise<Todo> => {
+    return await prisma.todo.update({
+        where: { id },
+        data: { sortOrder },
+    });
+};

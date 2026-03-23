@@ -92,3 +92,50 @@ export const updateTodo = async (req: Request, res: Response, next: NextFunction
         res.status(status).json({ error: { code: err.code, message: err.message } });
     }
 };
+
+export const toggleComplete = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const { completed } = req.body;
+
+        if (typeof completed !== 'boolean') {
+            return res.status(400).json({
+                error: {
+                    code: 'VALIDATION_ERROR',
+                    message: 'completed는 boolean이어야 합니다.',
+                    field: 'completed',
+                },
+            });
+        }
+
+        const todo = await todosService.toggleComplete((req as any).user.id, req.params.id as string, completed);
+        res.status(200).json(todo);
+    } catch (err: any) {
+        const statusMap: Record<string, number> = {
+            NOT_FOUND: 404,
+            FORBIDDEN: 403,
+        };
+        const status = statusMap[err.code] ?? 500;
+        res.status(status).json({ error: { code: err.code, message: err.message } });
+    }
+};
+
+export const reorderTodo = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const { prev_order, next_order } = req.body;
+        const todo = await todosService.reorderTodo(
+            (req as any).user.id,
+            req.params.id as string,
+            prev_order ?? null,
+            next_order ?? null
+        );
+        res.status(200).json(todo);
+    } catch (err: any) {
+        const statusMap: Record<string, number> = {
+            NOT_FOUND: 404,
+            FORBIDDEN: 403,
+            VALIDATION_ERROR: 400,
+        };
+        const status = statusMap[err.code] ?? 500;
+        res.status(status).json({ error: { code: err.code, message: err.message } });
+    }
+};

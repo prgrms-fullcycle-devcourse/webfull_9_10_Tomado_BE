@@ -71,3 +71,57 @@ export const updateTodo = async (
         assignedDate: body.assigned_date,
     });
 };
+
+export const toggleComplete = async (userId: string, todoId: string, completed: boolean) => {
+    const todo = await todosRepository.findTodoById(todoId);
+
+    if (!todo) {
+        const err = new Error('해당 투두를 찾을 수 없습니다.') as any;
+        err.code = 'NOT_FOUND';
+        throw err;
+    }
+    if (todo.userId !== userId) {
+        const err = new Error('본인의 투두만 수정할 수 있습니다.') as any;
+        err.code = 'FORBIDDEN';
+        throw err;
+    }
+
+    return todosRepository.toggleTodoComplete(todoId, completed);
+};
+
+export const reorderTodo = async (
+    userId: string,
+    todoId: string,
+    prevOrder: number | null,
+    nextOrder: number | null
+) => {
+    if (prevOrder !== null && nextOrder !== null && prevOrder >= nextOrder) {
+        const err = new Error('prev_order는 next_order보다 작아야 합니다.') as any;
+        err.code = 'VALIDATION_ERROR';
+        throw err;
+    }
+
+    const todo = await todosRepository.findTodoById(todoId);
+
+    if (!todo) {
+        const err = new Error('해당 투두를 찾을 수 없습니다.') as any;
+        err.code = 'NOT_FOUND';
+        throw err;
+    }
+    if (todo.userId !== userId) {
+        const err = new Error('본인의 투두만 수정할 수 있습니다.') as any;
+        err.code = 'FORBIDDEN';
+        throw err;
+    }
+
+    let newOrder: number;
+    if (prevOrder === null && nextOrder !== null) {
+        newOrder = nextOrder / 2;
+    } else if (nextOrder === null && prevOrder !== null) {
+        newOrder = prevOrder + 1.0;
+    } else {
+        newOrder = (prevOrder! + nextOrder!) / 2;
+    }
+
+    return todosRepository.reorderTodo(todoId, newOrder);
+};

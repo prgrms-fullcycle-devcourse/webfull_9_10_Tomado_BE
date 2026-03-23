@@ -1,0 +1,94 @@
+import { Request, Response, NextFunction } from 'express';
+import * as todosService from '../services/todos.service.js';
+
+export const getTodos = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const { date } = req.query;
+
+        if (!date || typeof date !== 'string') {
+            return res.status(400).json({
+                error: {
+                    code: 'VALIDATION_ERROR',
+                    message: 'date 쿼리 파라미터는 필수입니다.',
+                    field: 'date',
+                },
+            });
+        }
+
+        const todos = await todosService.getTodos((req as any).user.id, date);
+        res.status(200).json(todos);
+    } catch (err) {
+        next(err);
+    }
+};
+
+export const createTodo = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const { title, description, assigned_date } = req.body;
+
+        // 필수값 체크
+        if (!title) {
+            return res.status(400).json({
+                error: {
+                    code: 'VALIDATION_ERROR',
+                    message: 'title은 필수 항목입니다.',
+                    field: 'title',
+                },
+            });
+        }
+        if (!assigned_date) {
+            return res.status(400).json({
+                error: {
+                    code: 'VALIDATION_ERROR',
+                    message: 'assigned_date는 필수 항목입니다.',
+                    field: 'assigned_date',
+                },
+            });
+        }
+
+        const todo = await todosService.createTodo((req as any).user.id, {
+            title,
+            description,
+            assigned_date,
+        });
+
+        res.status(201).json(todo);
+    } catch (err) {
+        next(err);
+    }
+};
+
+export const deleteTodo = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const id = req.params.id as string;
+        await todosService.deleteTodo((req as any).user.id, id);
+        res.status(204).send();
+    } catch (err: any) {
+        const statusMap: Record<string, number> = {
+            NOT_FOUND: 404,
+            FORBIDDEN: 403,
+            VALIDATION_ERROR: 400,
+        };
+        const status = statusMap[err.code] ?? 500;
+        res.status(status).json({ error: { code: err.code, message: err.message } });
+    }
+};
+
+export const updateTodo = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const { title, description, assigned_date } = req.body;
+        const todo = await todosService.updateTodo((req as any).user.id, req.params.id as string, {
+            title,
+            description,
+            assigned_date,
+        });
+        res.status(200).json(todo);
+    } catch (err: any) {
+        const statusMap: Record<string, number> = {
+            NOT_FOUND: 404,
+            FORBIDDEN: 403,
+        };
+        const status = statusMap[err.code] ?? 500;
+        res.status(status).json({ error: { code: err.code, message: err.message } });
+    }
+};

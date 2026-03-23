@@ -2,8 +2,7 @@ import cors from 'cors';
 import express from 'express';
 import swaggerUi from 'swagger-ui-express';
 import swaggerSpec from './swagger/index.js';
-
-import { healthRouter } from './routes/health.route.js';
+import todosRouter from './routes/todos.routes.js';
 
 export function createApp() {
     const app = express();
@@ -12,7 +11,7 @@ export function createApp() {
     app.use(express.json());
 
     app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
-    app.use(healthRouter);
+    app.use('/todos', todosRouter);
 
     return app;
 }

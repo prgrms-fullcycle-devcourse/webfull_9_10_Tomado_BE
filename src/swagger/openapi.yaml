@@ -569,7 +569,7 @@ paths:
   # ══════════════════════════════════════
   # 2. USERS
   # ══════════════════════════════════════
-  /users/me:
+  /api/v1/users/me:
     get:
       tags: [Users]
       summary: 내 프로필 조회
@@ -630,7 +630,7 @@ paths:
         '401':
           $ref: '#/components/responses/Unauthorized'
 
-  /users/me/settings:
+  /api/v1/users/me/settings:
     get:
       tags: [Users]
       summary: 앱 설정 조회
@@ -711,7 +711,7 @@ paths:
   # ══════════════════════════════════════
   # 3. TODOS
   # ══════════════════════════════════════
-  /todos:
+  /api/v1/todos:
     get:
       tags: [Todos]
       summary: 날짜별 투두 목록 조회
@@ -787,7 +787,7 @@ paths:
         '401':
           $ref: '#/components/responses/Unauthorized'
 
-  /todos/{id}:
+  /api/v1/todos/{id}:
     patch:
       tags: [Todos]
       summary: 투두 수정
@@ -864,7 +864,7 @@ paths:
         '404':
           $ref: '#/components/responses/NotFound'
 
-  /todos/{id}/complete:
+  /api/v1/todos/{id}/complete:
     patch:
       tags: [Todos]
       summary: 투두 완료 토글
@@ -922,7 +922,7 @@ paths:
         '404':
           $ref: '#/components/responses/NotFound'
 
-  /todos/{id}/reorder:
+  /api/v1/todos/{id}/reorder:
     patch:
       tags: [Todos]
       summary: 투두 순서 변경

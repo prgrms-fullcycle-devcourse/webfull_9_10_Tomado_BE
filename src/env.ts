@@ -1,5 +1,4 @@
 import * as dotenv from 'dotenv';
-import fs from 'node:fs';
 import { z } from 'zod';
 
 dotenv.config();
@@ -13,4 +12,15 @@ const EnvSchema = z.object({
     SUPABASE_SERVICE_ROLE_KEY: z.string().min(1),
 });
 
-export const env = EnvSchema.parse(process.env);
+const parsed = EnvSchema.safeParse(process.env);
+
+if (!parsed.success) {
+    console.error('❌ 환경 변수 검증 실패 상세 내용:');
+    parsed.error.errors.forEach((err) => {
+        const fieldName = String(err.path[0]);
+        console.error(`  - [${fieldName}] 필드: ${err.message}`);
+    });
+    process.exit(1);
+}
+
+export const env = parsed.data;

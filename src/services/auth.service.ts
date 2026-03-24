@@ -101,7 +101,7 @@ export async function register(rawBody: unknown) {
     }
 
     try {
-        const user = await authRepo.createUserWithSettings(login_id, nickname);
+        const user = await authRepo.createUserWithSettings(authUserId, login_id, nickname);
         const { data: signedIn, error: signInError } = await supabaseClient.auth.signInWithPassword({
             email,
             password,

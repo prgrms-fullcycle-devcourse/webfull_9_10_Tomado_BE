@@ -261,6 +261,10 @@ components:
           type: string
           format: date
           example: '2026-06-10'
+        title:
+          type: string
+          nullable: true
+          example: "오늘의 개발 일지"
         content:
           type: string
           example: "## 오늘 한 일\n- API 명세서 작성 완료\n- ERD 리뷰"
@@ -296,6 +300,10 @@ components:
           type: string
           format: date
           example: '2026-06-10'
+        title:
+          type: string
+          nullable: true
+          example: "오늘의 개발 일지"
         tags:
           type: array
           items:
@@ -1201,6 +1209,9 @@ paths:
               type: object
               required: [log_date, content]
               properties:
+                title:
+                  type: string
+                  example: "오늘의 개발 일지"
                 log_date:
                   type: string
                   format: date
@@ -1276,6 +1287,61 @@ paths:
         '401':
           $ref: '#/components/responses/Unauthorized'
 
+  /daily-logs/search:
+    get:
+      tags: [DailyLogs]
+      summary: 데일리 로그 검색
+      description: title + content 기반 검색
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: q
+          in: query
+          required: true
+          schema:
+            type: string
+          example: 'API 명세서'
+      responses:
+        '200':
+          description: 검색 결과 반환
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: string
+                      format: uuid
+                    log_date:
+                      type: string
+                      format: date
+                    title:
+                      type: string
+                    content_preview:
+                      type: string
+                      description: 검색어 앞뒤 50자
+                    tags:
+                      type: array
+                      items:
+                        type: string
+                    has_retro_log:
+                      type: boolean
+        '400':
+          description: 검색어 누락
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              example:
+                error:
+                  code: VALIDATION_ERROR
+                  message: 검색어(q)는 필수입니다.
+                  field: q
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
   /daily-logs/{id}:
     patch:
       tags: [DailyLogs]
@@ -1298,6 +1364,9 @@ paths:
             schema:
               type: object
               properties:
+                title:
+                  type: string
+                  example: "오늘의 개발 일지"
                 content:
                   type: string
                   example: "## 오늘 한 일\n- API 명세서 작성 완료\n- 팀 코드 리뷰"
@@ -1475,6 +1544,60 @@ paths:
                 error:
                   code: CONFLICT
                   message: 2026-06-10 날짜의 회고가 이미 존재합니다.
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+  
+  /retro-logs/search:
+    get:
+      tags: [RetroLogs]
+      summary: 회고 로그 검색
+      description: content 기반 검색
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: q
+          in: query
+          required: true
+          schema:
+            type: string
+          example: 'API 명세서'
+      responses:
+        '200':
+          description: 검색 결과 반환
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: string
+                      format: uuid
+                    daily_log_id:
+                      type: string
+                      format: uuid
+                      nullable: true
+                    retro_date:
+                      type: string
+                      format: date
+                    template_type:
+                      type: string
+                      enum: [Tech, Decision, Communication, Emotion]
+                    content_preview:
+                      type: string
+                      description: 검색어 앞뒤 50자
+        '400':
+          description: 검색어 누락
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              example:
+                error:
+                  code: VALIDATION_ERROR
+                  message: 검색어(q)는 필수입니다.
+                  field: q
         '401':
           $ref: '#/components/responses/Unauthorized'
 

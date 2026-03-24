@@ -82,6 +82,7 @@ model DailyLog {
   id           String    @id @default(uuid()) @db.Uuid
   userId       String    @map("user_id") @db.Uuid
   logDate      DateTime  @map("log_date") @db.Date
+  title        String?
   content      String?
   tags         String[]  @default([])
   isDirty      Boolean   @default(false) @map("is_dirty")

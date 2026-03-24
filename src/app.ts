@@ -4,6 +4,7 @@ import swaggerUi from 'swagger-ui-express';
 import swaggerSpec from './swagger/index.js';
 
 import { authRouter } from './routes/auth.routes.js';
+import usersRouter from './routes/users.routes.js';
 
 export function createApp() {
     const app = express();
@@ -13,7 +14,9 @@ export function createApp() {
 
     app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
+    // 라우터 등록
     app.use('/auth', authRouter);
+    app.use('/api/v1/users', usersRouter);
 
     return app;
 }

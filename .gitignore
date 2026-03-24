@@ -25,3 +25,6 @@ pnpm-debug.log*
 ## Build
 dist/
 
+## docs
+docs/tomado_api.md
+

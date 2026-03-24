@@ -1,9 +1,9 @@
 import { prisma } from '../lib/prisma.js';
 
-export async function createUserWithSettings(loginId: string, nickname: string) {
+export async function createUserWithSettings(id: string, loginId: string, nickname: string) {
     return prisma.$transaction(async (tx) => {
         const user = await tx.user.create({
-            data: { loginId, nickname },
+            data: { id, loginId, nickname },
         });
         await tx.userSetting.create({
             data: { userId: user.id },

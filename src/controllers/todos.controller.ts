@@ -25,7 +25,7 @@ export const getTodos = async (req: Request, res: Response, next: NextFunction) 
 export const createTodo = async (req: Request, res: Response, next: NextFunction) => {
     try {
         const { title, description, assigned_date } = req.body;
-
+        console.log('현재 로그인된 유저 ID:', res.locals.authUserId);
         // 필수값 체크
         if (!title) {
             return res.status(400).json({

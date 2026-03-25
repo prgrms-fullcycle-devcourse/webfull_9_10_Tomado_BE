@@ -12,6 +12,9 @@ export function createApp() {
     app.use(cors());
     app.use(express.json());
 
+    // Health Check
+    app.get('/healthz', (req, res) => res.status(200).send('OK'));
+
     app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
     // 라우터 등록

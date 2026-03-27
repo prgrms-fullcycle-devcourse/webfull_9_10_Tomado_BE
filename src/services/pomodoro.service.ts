@@ -11,7 +11,7 @@ const createError = (code: string, message: string, field?: string) => {
 };
 
 // 세션 시작
-export const createSession = async (userId: string, body: { type: string; focus_date: string; started_at: string }) => {
+export const createSession = async (userId: string, body: { type: string; focus_date: string }) => {
     if (!VALID_TYPES.includes(body.type)) {
         throw createError('VALIDATION_ERROR', 'type은 focus, short_break, long_break 중 하나여야 합니다.', 'type');
     }
@@ -20,7 +20,6 @@ export const createSession = async (userId: string, body: { type: string; focus_
         userId,
         type: body.type,
         focusDate: body.focus_date,
-        startedAt: body.started_at,
     });
 };
 

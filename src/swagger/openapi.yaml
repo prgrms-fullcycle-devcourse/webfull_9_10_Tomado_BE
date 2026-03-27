@@ -1005,7 +1005,7 @@ paths:
           application/json:
             schema:
               type: object
-              required: [type, focus_date, started_at]
+              required: [type, focus_date]
               properties:
                 type:
                   type: string
@@ -1015,10 +1015,7 @@ paths:
                   type: string
                   format: date
                   example: '2026-06-10'
-                started_at:
-                  type: string
-                  format: date-time
-                  example: '2026-06-10T09:00:00Z'
+
       responses:
         '201':
           description: 세션 생성 성공

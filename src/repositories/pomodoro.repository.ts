@@ -7,7 +7,6 @@ export const createSession = async (data: {
     userId: string;
     type: string;
     focusDate: string;
-    startedAt: string;
 }): Promise<PomodoroSession> => {
     return await prisma.pomodoroSession.create({
         data: {
@@ -16,7 +15,6 @@ export const createSession = async (data: {
             status: null as any,
             actualSec: null as any,
             focusDate: new Date(data.focusDate),
-            startedAt: new Date(data.startedAt),
         },
     });
 };

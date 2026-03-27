@@ -23,22 +23,16 @@ const handleError = (err: any, res: Response) => {
 // POST /pomodoro/sessions
 export const createSession = async (req: Request, res: Response, next: NextFunction) => {
     try {
-        const { type, focus_date } = req.body;
+        const { type } = req.body;
 
         if (!type) {
             return res.status(400).json({
                 error: { code: 'VALIDATION_ERROR', message: 'type은 필수 입니다.', field: 'type' },
             });
         }
-        if (!focus_date) {
-            return res.status(400).json({
-                error: { code: 'VALIDATION_ERROR', message: 'focus_date는 필수입니다.', field: 'focus_date' },
-            });
-        }
 
         const session = await pomodoroService.createSession(res.locals.authUserId as string, {
             type,
-            focus_date,
         });
         res.status(201).json(session);
     } catch (err: any) {

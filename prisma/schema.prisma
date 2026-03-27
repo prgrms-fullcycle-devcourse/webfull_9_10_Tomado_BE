@@ -68,7 +68,7 @@ model PomodoroSession {
   type        String
   status      String?
   actualSec   Int?       @map("actual_sec")
-  focusDate   DateTime  @map("focus_date") @db.Date
+  focusDate   DateTime  @default(now()) @map("focus_date") @db.Date
   startedAt DateTime @default(now()) @map("started_at") @db.Timestamptz
   endedAt     DateTime? @map("ended_at") @db.Timestamptz
   createdAt   DateTime  @default(now()) @map("created_at") @db.Timestamptz

@@ -3,18 +3,13 @@ import { PrismaClient, PomodoroSession } from '@prisma/client';
 const prisma = new PrismaClient();
 
 // 세션 생성
-export const createSession = async (data: {
-    userId: string;
-    type: string;
-    focusDate: string;
-}): Promise<PomodoroSession> => {
+export const createSession = async (data: { userId: string; type: string }): Promise<PomodoroSession> => {
     return await prisma.pomodoroSession.create({
         data: {
             userId: data.userId,
             type: data.type,
             status: null as any,
             actualSec: null as any,
-            focusDate: new Date(data.focusDate),
         },
     });
 };

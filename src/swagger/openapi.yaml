@@ -1005,16 +1005,12 @@ paths:
           application/json:
             schema:
               type: object
-              required: [type, focus_date]
+              required: [type]
               properties:
                 type:
                   type: string
                   enum: [focus, short_break, long_break]
                   example: focus
-                focus_date:
-                  type: string
-                  format: date
-                  example: '2026-06-10'
 
       responses:
         '201':

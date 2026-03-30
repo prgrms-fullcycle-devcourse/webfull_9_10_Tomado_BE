@@ -1439,25 +1439,26 @@ paths:
     get:
       tags: [RetroLogs]
       summary: 회고 조회
-      description: 특정 날짜 또는 `daily_log_id`로 회고 조회. 두 파라미터 중 하나 필수.
+      description: `daily_log_id`와 `date`(YYYY-MM-DD)로 회고 조회. 두 쿼리 파라미터 모두 필수.
       security:
         - BearerAuth: []
       parameters:
         - name: date
           in: query
-          required: false
+          required: true
           schema:
             type: string
             format: date
           example: '2026-06-10'
-          description: date 또는 daily_log_id 중 하나 필수
+          description: 회고 날짜 (YYYY-MM-DD). daily_log_id와 함께 필수.
         - name: daily_log_id
           in: query
-          required: false
+          required: true
           schema:
             type: string
             format: uuid
           example: f6a7b8c9-d0e1-2345-f012-456789012345
+          description: 연관 일일 로그 ID. date와 함께 필수.
       responses:
         '200':
           description: 회고 조회 성공

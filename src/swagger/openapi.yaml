@@ -490,7 +490,7 @@ paths:
   # ══════════════════════════════════════
   # 1. AUTH
   # ══════════════════════════════════════
-  /auth/register:
+  /api/v1/auth/register:
     post:
       tags: [Auth]
       summary: 회원가입
@@ -563,7 +563,7 @@ paths:
                   code: CONFLICT
                   message: 이미 사용 중인 login_id입니다.
 
-  /auth/login:
+  /api/v1/auth/login:
     post:
       tags: [Auth]
       summary: 로그인
@@ -614,7 +614,7 @@ paths:
                   code: UNAUTHORIZED
                   message: 아이디 또는 비밀번호가 올바르지 않습니다.
 
-  /auth/refresh:
+  /api/v1/auth/refresh:
     post:
       tags: [Auth]
       summary: 토큰 재발급
@@ -651,7 +651,7 @@ paths:
                   code: UNAUTHORIZED
                   message: Refresh Token이 만료되었거나 유효하지 않습니다.
 
-  /auth/logout:
+  /api/v1/auth/logout:
     post:
       tags: [Auth]
       summary: 로그아웃
@@ -1523,7 +1523,7 @@ paths:
   # ══════════════════════════════════════
   # 6. RETRO LOGS
   # ══════════════════════════════════════
-  /retro-logs:
+  /api/v1/retro-logs:
     get:
       tags: [RetroLogs]
       summary: 회고 조회
@@ -1653,7 +1653,7 @@ paths:
         '401':
           $ref: '#/components/responses/Unauthorized'
   
-  /retro-logs/search:
+  /api/v1/retro-logs/search:
     get:
       tags: [RetroLogs]
       summary: 회고 로그 검색
@@ -1707,7 +1707,7 @@ paths:
         '401':
           $ref: '#/components/responses/Unauthorized'
 
-  /retro-logs/{id}:
+  /api/v1/retro-logs/{id}:
     patch:
       tags: [RetroLogs]
       summary: 회고 수정

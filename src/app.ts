@@ -20,7 +20,7 @@ export function createApp() {
     app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
     // 라우터 등록
-    app.use('/auth', authRouter);
+    app.use('/api/v1/auth', authRouter);
     app.use('/api/v1/users', usersRouter);
     app.use('/api/v1/todos', todosRouter);
     app.use('/pomodoro', pomodoroRouter);

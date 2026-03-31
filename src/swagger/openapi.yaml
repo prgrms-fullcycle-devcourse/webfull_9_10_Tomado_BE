@@ -340,11 +340,65 @@ components:
           example: Tech
         content:
           type: object
-          description: 템플릿 항목별 텍스트 (template_type에 따라 키 구조가 다름)
-          example:
-            what_went_well: API 명세서 설계가 예상보다 빨리 완료됨
-            what_to_improve: 에러 케이스 예시 작성이 미흡했음
-            action_items: 다음 PR 전에 에러 시나리오 테스트 케이스 추가
+          description: template_type에 따라 content 템플릿 키가 달라집니다.
+          oneOf:
+            - type: object
+              required: [learned, difficulty, solution]
+              properties:
+                learned:
+                  type: string
+                  example: Prisma transaction 처리 패턴을 배웠다.
+                difficulty:
+                  type: string
+                  example: Json null 업데이트 시 타입 에러가 발생했다.
+                solution:
+                  type: string
+                  example: Prisma.DbNull로 명시해 타입을 맞췄다.
+            - type: object
+              required: [context, options, decision, rationale]
+              properties:
+                context:
+                  type: string
+                  example: 조회 파라미터 정책을 정해야 했다.
+                options:
+                  type: string
+                  example: date만 필수 / daily_log_id만 필수 / 둘 다 필수
+                decision:
+                  type: string
+                  example: date + daily_log_id 둘 다 필수로 결정했다.
+                rationale:
+                  type: string
+                  example: 조회 정확도와 계약 명확성을 높이기 위해서다.
+            - type: object
+              required: [audience, message, feedback, follow_up]
+              properties:
+                audience:
+                  type: string
+                  example: 프론트엔드 팀
+                message:
+                  type: string
+                  example: 회고 조회는 date와 daily_log_id 둘 다 필요하다고 공유했다.
+                feedback:
+                  type: string
+                  example: API 계약이 명확해져 구현이 쉬워졌다는 피드백을 받았다.
+                follow_up:
+                  type: string
+                  example: Swagger/Notion 문구를 동일하게 맞춰 재공지했다.
+            - type: object
+              required: [mood, trigger, impact, recovery]
+              properties:
+                mood:
+                  type: string
+                  example: 조급함 60%, 안도감 40%
+                trigger:
+                  type: string
+                  example: 병합 충돌 발생 후 해결
+                impact:
+                  type: string
+                  example: 초반 집중 저하, 후반 회복
+                recovery:
+                  type: string
+                  example: 작업 단위를 쪼개고 체크리스트로 정리했다.
         is_dirty:
           type: boolean
           example: false
@@ -1507,10 +1561,31 @@ paths:
                   example: Tech
                 content:
                   type: object
-                  example:
-                    what_went_well: API 명세서 설계가 예상보다 빨리 완료됨
-                    what_to_improve: 에러 케이스 예시 작성이 미흡했음
-                    action_items: 다음 PR 전에 에러 시나리오 테스트 케이스 추가
+                  description: template_type별 content 예시
+                  examples:
+                    tech:
+                      value:
+                        learned: Prisma transaction 처리 패턴을 배웠다.
+                        difficulty: Json null 업데이트 시 타입 에러가 발생했다.
+                        solution: Prisma.DbNull로 명시해 타입을 맞췄다.
+                    decision:
+                      value:
+                        context: 조회 파라미터 정책을 정해야 했다.
+                        options: date만 필수 / daily_log_id만 필수 / 둘 다 필수
+                        decision: date + daily_log_id 둘 다 필수로 결정했다.
+                        rationale: 조회 정확도와 계약 명확성을 높이기 위해서다.
+                    communication:
+                      value:
+                        audience: 프론트엔드 팀
+                        message: 회고 조회는 date와 daily_log_id 둘 다 필요하다고 공유했다.
+                        feedback: API 계약이 명확해져 구현이 쉬워졌다는 피드백을 받았다.
+                        follow_up: Swagger/Notion 문구를 동일하게 맞춰 재공지했다.
+                    emotion:
+                      value:
+                        mood: 조급함 60%, 안도감 40%
+                        trigger: 병합 충돌 발생 후 해결
+                        impact: 초반 집중 저하, 후반 회복
+                        recovery: 작업 단위를 쪼개고 체크리스트로 정리했다.
       responses:
         '201':
           description: 회고 생성 성공
@@ -1620,10 +1695,13 @@ paths:
               properties:
                 content:
                   type: object
-                  example:
-                    what_went_well: API 명세서 설계 완료 + 팀 공유까지 완료
-                    what_to_improve: 에러 케이스 예시 작성 보완 필요
-                    action_items: 내일 오전 중 테스트 코드 추가
+                  description: 기존 template_type에 맞는 content 구조로 수정
+                  examples:
+                    tech:
+                      value:
+                        learned: API 명세와 구현의 차이를 명확히 파악했다.
+                        difficulty: 응답 에러 포맷 통일 과정에서 중복 처리가 있었다.
+                        solution: 공통 에러 매핑 로직으로 정리했다.
                 is_dirty:
                   type: boolean
                   example: false

@@ -6,6 +6,13 @@ import * as retroRepo from '../repositories/retroLogs.repository.js';
 const TEMPLATE_TYPES = ['Tech', 'Decision', 'Communication', 'Emotion'] as const;
 export type TemplateType = (typeof TEMPLATE_TYPES)[number];
 
+const TEMPLATE_REQUIRED_KEYS: Record<TemplateType, readonly string[]> = {
+    Tech: ['learned', 'difficulty', 'solution'],
+    Decision: ['context', 'options', 'decision', 'rationale'],
+    Communication: ['audience', 'message', 'feedback', 'follow_up'],
+    Emotion: ['mood', 'trigger', 'impact', 'recovery'],
+};
+
 function isTemplateType(v: unknown): v is TemplateType {
     return typeof v === 'string' && (TEMPLATE_TYPES as readonly string[]).includes(v);
 }
@@ -15,6 +22,29 @@ function throwCode(code: string, message: string, field?: string): never {
     err.code = code;
     if (field !== undefined) err.field = field;
     throw err;
+}
+
+function validateTemplateContent(
+    templateType: TemplateType,
+    content: unknown
+): asserts content is Record<string, unknown> {
+    if (content === null || typeof content !== 'object' || Array.isArray(content)) {
+        throwCode('VALIDATION_ERROR', 'content는 객체여야 합니다.', 'content');
+    }
+
+    const requiredKeys = TEMPLATE_REQUIRED_KEYS[templateType];
+    const missingKeys = requiredKeys.filter((k) => {
+        const v = (content as Record<string, unknown>)[k];
+        return typeof v !== 'string' || v.trim() === '';
+    });
+
+    if (missingKeys.length > 0) {
+        throwCode(
+            'VALIDATION_ERROR',
+            `${templateType} 템플릿의 필수 항목이 누락되었습니다: ${missingKeys.join(', ')}`,
+            'content'
+        );
+    }
 }
 
 export function serializeRetroLog(row: RetroLog) {
@@ -95,9 +125,7 @@ export async function createRetro(
             'template_type'
         );
     }
-    if (content === undefined || content === null || typeof content !== 'object') {
-        throwCode('VALIDATION_ERROR', 'content는 객체여야 합니다.', 'content');
-    }
+    validateTemplateContent(template_type, content);
 
     const dailyLog = await retroRepo.findDailyLogOwnedByUser(daily_log_id, userId);
     if (!dailyLog) {
@@ -155,6 +183,9 @@ export async function updateRetro(
     if (row.userId !== userId) {
         throwCode('FORBIDDEN', '본인의 회고만 수정할 수 있습니다.');
     }
+    if (!isTemplateType(row.templateType)) {
+        throwCode('VALIDATION_ERROR', '알 수 없는 template_type입니다.', 'template_type');
+    }
 
     const patch: {
         content?: Prisma.InputJsonValue;
@@ -163,9 +194,7 @@ export async function updateRetro(
     } = {};
 
     if (body.content !== undefined) {
-        if (body.content === null || typeof body.content !== 'object') {
-            throwCode('VALIDATION_ERROR', 'content는 객체여야 합니다.', 'content');
-        }
+        validateTemplateContent(row.templateType, body.content);
         patch.content = body.content as Prisma.InputJsonValue;
     }
     if (body.is_dirty !== undefined) {

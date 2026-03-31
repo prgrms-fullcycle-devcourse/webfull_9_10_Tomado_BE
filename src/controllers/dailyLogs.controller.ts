@@ -15,7 +15,7 @@ const handleError = (res: Response, e: any) => {
 // 데일리 로그 생성
 export const createLog = async (req: Request, res: Response) => {
     try {
-        const userId = (req as any).user.id;
+        const userId = res.locals.authUserId;
         const { log_date, title, content, tags } = req.body;
 
         const log = await dailyLogsService.createLog(userId, {
@@ -34,7 +34,7 @@ export const createLog = async (req: Request, res: Response) => {
 // 특정 날짜 로그 조회
 export const getLogByDate = async (req: Request, res: Response) => {
     try {
-        const userId = (req as any).user.id;
+        const userId = res.locals.authUserId;
         const { date } = req.query;
 
         if (!date || typeof date !== 'string') {
@@ -53,7 +53,7 @@ export const getLogByDate = async (req: Request, res: Response) => {
 // 목록 조회
 export const getLogsInRange = async (req: Request, res: Response) => {
     try {
-        const userId = (req as any).user.id;
+        const userId = res.locals.authUserId;
         const { start_date, end_date } = req.query;
 
         if (!start_date || !end_date) {
@@ -72,7 +72,7 @@ export const getLogsInRange = async (req: Request, res: Response) => {
 // 검색
 export const searchLogs = async (req: Request, res: Response) => {
     try {
-        const userId = (req as any).user.id;
+        const userId = res.locals.authUserId;
         const { q } = req.query;
 
         if (!q || typeof q !== 'string') {
@@ -91,7 +91,7 @@ export const searchLogs = async (req: Request, res: Response) => {
 // 수정
 export const updateLog = async (req: Request, res: Response) => {
     try {
-        const userId = (req as any).user.id;
+        const userId = res.locals.authUserId;
         const id = req.params.id as string;
         const { title, content, tags, is_dirty, draft_content } = req.body;
 
@@ -112,7 +112,7 @@ export const updateLog = async (req: Request, res: Response) => {
 // 삭제
 export const deleteLog = async (req: Request, res: Response) => {
     try {
-        const userId = (req as any).user.id;
+        const userId = res.locals.authUserId;
         const id = req.params.id as string;
 
         await dailyLogsService.deleteLog(userId, id);

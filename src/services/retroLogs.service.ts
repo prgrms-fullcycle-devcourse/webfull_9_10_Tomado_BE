@@ -7,7 +7,7 @@ const TEMPLATE_TYPES = ['Tech', 'Decision', 'Communication', 'Emotion'] as const
 export type TemplateType = (typeof TEMPLATE_TYPES)[number];
 
 const TEMPLATE_REQUIRED_KEYS: Record<TemplateType, readonly string[]> = {
-    Tech: ['learned', 'difficulty', 'solution'],
+    Tech: ['learned', 'difficulty', 'solution', 'next_experiment'],
     Decision: ['context', 'options', 'decision', 'rationale'],
     Communication: ['audience', 'message', 'feedback', 'follow_up'],
     Emotion: ['mood', 'trigger', 'impact', 'recovery'],

@@ -343,7 +343,7 @@ components:
           description: template_type에 따라 content 템플릿 키가 달라집니다.
           oneOf:
             - type: object
-              required: [learned, difficulty, solution]
+              required: [learned, difficulty, solution, next_experiment]
               properties:
                 learned:
                   type: string
@@ -354,6 +354,9 @@ components:
                 solution:
                   type: string
                   example: Prisma.DbNull로 명시해 타입을 맞췄다.
+                next_experiment:
+                  type: string
+                  example: 다음 PR에서 검색 쿼리 인덱스 전략을 시도해본다.
             - type: object
               required: [context, options, decision, rationale]
               properties:
@@ -1568,6 +1571,7 @@ paths:
                         learned: Prisma transaction 처리 패턴을 배웠다.
                         difficulty: Json null 업데이트 시 타입 에러가 발생했다.
                         solution: Prisma.DbNull로 명시해 타입을 맞췄다.
+                        next_experiment: 다음 PR에서 검색 쿼리 인덱스 전략을 시도해본다.
                     decision:
                       value:
                         context: 조회 파라미터 정책을 정해야 했다.
@@ -1702,6 +1706,7 @@ paths:
                         learned: API 명세와 구현의 차이를 명확히 파악했다.
                         difficulty: 응답 에러 포맷 통일 과정에서 중복 처리가 있었다.
                         solution: 공통 에러 매핑 로직으로 정리했다.
+                        next_experiment: 에러 응답 E2E 테스트 케이스를 추가한다.
                 is_dirty:
                   type: boolean
                   example: false

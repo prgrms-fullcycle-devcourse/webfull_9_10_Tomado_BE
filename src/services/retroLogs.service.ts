@@ -7,10 +7,10 @@ const TEMPLATE_TYPES = ['Tech', 'Decision', 'Communication', 'Emotion'] as const
 export type TemplateType = (typeof TEMPLATE_TYPES)[number];
 
 const TEMPLATE_REQUIRED_KEYS: Record<TemplateType, readonly string[]> = {
-    Tech: ['learned', 'difficulty', 'solution', 'next_experiment'],
-    Decision: ['context', 'options', 'decision', 'rationale'],
-    Communication: ['audience', 'message', 'feedback', 'follow_up'],
-    Emotion: ['mood', 'trigger', 'impact', 'recovery'],
+    Tech: ['learned_today', 'applied_technology', 'technical_difficulty', 'next_to_try'],
+    Decision: ['decision_made', 'decision_reason', 'outcome_impact', 'alternatives_considered'],
+    Communication: ['communication_highlights', 'communication_friction', 'feedback_received', 'improvements'],
+    Emotion: ['mood_today', 'what_energized', 'what_drained', 'grateful_for'],
 };
 
 function isTemplateType(v: unknown): v is TemplateType {

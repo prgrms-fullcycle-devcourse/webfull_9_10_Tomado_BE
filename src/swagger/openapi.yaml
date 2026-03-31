@@ -343,65 +343,92 @@ components:
           description: template_type에 따라 content 템플릿 키가 달라집니다.
           oneOf:
             - type: object
-              required: [learned, difficulty, solution, next_experiment]
+              description: Tech — learned today, applied tech, difficulty, next try
+              required:
+                [learned_today, applied_technology, technical_difficulty, next_to_try]
               properties:
-                learned:
+                learned_today:
                   type: string
-                  example: Prisma transaction 처리 패턴을 배웠다.
-                difficulty:
+                  description: Technology or concept learned today
+                  example: Learned Prisma $transaction for atomic create + stats update.
+                applied_technology:
                   type: string
-                  example: Json null 업데이트 시 타입 에러가 발생했다.
-                solution:
+                  description: Technology or approach applied today
+                  example: Applied Prisma.DbNull for optional JSON null updates.
+                technical_difficulty:
                   type: string
-                  example: Prisma.DbNull로 명시해 타입을 맞췄다.
-                next_experiment:
+                  description: Technical challenges faced
+                  example: Json field null typing errors during PATCH.
+                next_to_try:
                   type: string
-                  example: 다음 PR에서 검색 쿼리 인덱스 전략을 시도해본다.
+                  description: What to try next
+                  example: Experiment with DB indexing for retro content search.
             - type: object
-              required: [context, options, decision, rationale]
+              description: Decision — decision, reason, outcome, alternatives
+              required: [decision_made, decision_reason, outcome_impact, alternatives_considered]
               properties:
-                context:
+                decision_made:
                   type: string
-                  example: 조회 파라미터 정책을 정해야 했다.
-                options:
+                  description: Decision made today
+                  example: Require both date and daily_log_id for retro GET.
+                decision_reason:
                   type: string
-                  example: date만 필수 / daily_log_id만 필수 / 둘 다 필수
-                decision:
+                  description: Why this decision
+                  example: Clearer API contract and fewer ambiguous lookups.
+                outcome_impact:
                   type: string
-                  example: date + daily_log_id 둘 다 필수로 결정했다.
-                rationale:
+                  description: Results and impact
+                  example: FE can rely on stable query shape; fewer support questions.
+                alternatives_considered:
                   type: string
-                  example: 조회 정확도와 계약 명확성을 높이기 위해서다.
+                  description: Other options if any (e.g. "None" or listed alternatives)
+                  example: 'Considered: date-only, id-only, or both required — chose both.'
             - type: object
-              required: [audience, message, feedback, follow_up]
+              description: Communication — wins, friction, feedback, improvements
+              required:
+                [
+                  communication_highlights,
+                  communication_friction,
+                  feedback_received,
+                  improvements,
+                ]
               properties:
-                audience:
+                communication_highlights:
                   type: string
-                  example: 프론트엔드 팀
-                message:
+                  description: Communication that went well
+                  example: Retro API contract was aligned quickly in a short sync.
+                communication_friction:
                   type: string
-                  example: 회고 조회는 date와 daily_log_id 둘 다 필요하다고 공유했다.
-                feedback:
+                  description: Misunderstandings or friction
+                  example: Initial doc said only one query param was required.
+                feedback_received:
                   type: string
-                  example: API 계약이 명확해져 구현이 쉬워졌다는 피드백을 받았다.
-                follow_up:
+                  description: Feedback received from others
+                  example: FE asked for explicit 400 errors when params are missing.
+                improvements:
                   type: string
-                  example: Swagger/Notion 문구를 동일하게 맞춰 재공지했다.
+                  description: What to improve next time
+                  example: Keep Swagger and Notion in sync when changing query rules.
             - type: object
-              required: [mood, trigger, impact, recovery]
+              description: Emotion — mood, energizers, drains, gratitude
+              required: [mood_today, what_energized, what_drained, grateful_for]
               properties:
-                mood:
+                mood_today:
                   type: string
-                  example: 조급함 60%, 안도감 40%
-                trigger:
+                  description: Overall mood today
+                  example: Tired but relieved after resolving merge conflicts.
+                what_energized:
                   type: string
-                  example: 병합 충돌 발생 후 해결
-                impact:
+                  description: What gave you energy
+                  example: Pair debugging with a teammate.
+                what_drained:
                   type: string
-                  example: 초반 집중 저하, 후반 회복
-                recovery:
+                  description: What drained your energy
+                  example: Long context switching between auth and retro features.
+                grateful_for:
                   type: string
-                  example: 작업 단위를 쪼개고 체크리스트로 정리했다.
+                  description: What you are grateful for
+                  example: Clear code review comments that sped up the fix.
         is_dirty:
           type: boolean
           example: false
@@ -1568,28 +1595,28 @@ paths:
                   examples:
                     tech:
                       value:
-                        learned: Prisma transaction 처리 패턴을 배웠다.
-                        difficulty: Json null 업데이트 시 타입 에러가 발생했다.
-                        solution: Prisma.DbNull로 명시해 타입을 맞췄다.
-                        next_experiment: 다음 PR에서 검색 쿼리 인덱스 전략을 시도해본다.
+                        learned_today: Prisma $transaction으로 생성과 통계 갱신을 한 번에 처리하는 패턴을 배웠다.
+                        applied_technology: optional JSON 필드 null 처리에 Prisma.DbNull을 적용했다.
+                        technical_difficulty: PATCH 시 Json 타입과 DbNull 조합에서 타입 에러가 났다.
+                        next_to_try: 회고 content 검색에 인덱스/쿼리 전략을 실험해본다.
                     decision:
                       value:
-                        context: 조회 파라미터 정책을 정해야 했다.
-                        options: date만 필수 / daily_log_id만 필수 / 둘 다 필수
-                        decision: date + daily_log_id 둘 다 필수로 결정했다.
-                        rationale: 조회 정확도와 계약 명확성을 높이기 위해서다.
+                        decision_made: 회고 조회는 date와 daily_log_id를 모두 필수로 한다.
+                        decision_reason: 조회 모호성을 줄이고 계약을 명확히 하기 위해서다.
+                        outcome_impact: 프론트가 쿼리 규칙을 안정적으로 의존할 수 있다.
+                        alternatives_considered: date만 필수, id만 필수, 둘 다 필수를 검토했고 둘 다 필수를 택했다.
                     communication:
                       value:
-                        audience: 프론트엔드 팀
-                        message: 회고 조회는 date와 daily_log_id 둘 다 필요하다고 공유했다.
-                        feedback: API 계약이 명확해져 구현이 쉬워졌다는 피드백을 받았다.
-                        follow_up: Swagger/Notion 문구를 동일하게 맞춰 재공지했다.
+                        communication_highlights: 짧은 미팅으로 API 계약을 빠르게 맞췄다.
+                        communication_friction: 초기 문서에는 쿼리 파라미터가 하나만 필수라고 적혀 있었다.
+                        feedback_received: 400 에러와 field를 명시해 달라는 요청을 받았다.
+                        improvements: 명세 변경 시 Swagger와 Notion을 동시에 갱신하겠다.
                     emotion:
                       value:
-                        mood: 조급함 60%, 안도감 40%
-                        trigger: 병합 충돌 발생 후 해결
-                        impact: 초반 집중 저하, 후반 회복
-                        recovery: 작업 단위를 쪼개고 체크리스트로 정리했다.
+                        mood_today: 병합 해소 후 안도감이 크다. 다소 피곤하다.
+                        what_energized: 동료와 짝으로 디버깅한 시간.
+                        what_drained: 인증·회고 작업을 번갈아 하며 맥락 전환이 잦았다.
+                        grateful_for: 리뷰 코멘트가 구체적이어서 수정이 빨랐다.
       responses:
         '201':
           description: 회고 생성 성공
@@ -1703,10 +1730,28 @@ paths:
                   examples:
                     tech:
                       value:
-                        learned: API 명세와 구현의 차이를 명확히 파악했다.
-                        difficulty: 응답 에러 포맷 통일 과정에서 중복 처리가 있었다.
-                        solution: 공통 에러 매핑 로직으로 정리했다.
-                        next_experiment: 에러 응답 E2E 테스트 케이스를 추가한다.
+                        learned_today: OpenAPI oneOf로 타입별 content 스키마를 문서화하는 법을 익혔다.
+                        applied_technology: 공통 sendServiceError 패턴으로 컨트롤러 에러 응답을 맞췄다.
+                        technical_difficulty: 예시 키와 실제 검증 키가 어긋나지 않게 유지하는 게 번거로웠다.
+                        next_to_try: 회고 템플릿 변경에 대한 마이그레이션 가이드를 팀 위키에 적는다.
+                    decision:
+                      value:
+                        decision_made: 템플릿 필수 키 검증은 서비스 레이어에만 둔다.
+                        decision_reason: 저장소·트랜잭션과 분리해 테스트하기 쉽게 하기 위해서다.
+                        outcome_impact: 컨트롤러는 얇게 유지되고 검증 로직이 한곳에 모인다.
+                        alternatives_considered: Zod 스키마 분리, DB CHECK 등은 이번 범위에서는 보류했다.
+                    communication:
+                      value:
+                        communication_highlights: 프론트에 새 content 키 목록을 한 번에 공유했다.
+                        communication_friction: 배포 전에 예시 JSON만 보고 구현해 필드명이 어긋났다.
+                        feedback_received: 스웨거 examples를 타입별로 나눠 달라는 요청이 있었다.
+                        improvements: 릴리즈 노트에 breaking change를 명시하기로 했다.
+                    emotion:
+                      value:
+                        mood_today: 문서·코드 동시 수정은 집중이 필요해 다소 긴장됐다.
+                        what_energized: 빌드가 한 번에 통과했을 때.
+                        what_drained: YAML 들여쓰기 실수를 두 번 고쳤다.
+                        grateful_for: CI에서 타입체크가 잡아줘서 런타임 전에 알 수 있었다.
                 is_dirty:
                   type: boolean
                   example: false

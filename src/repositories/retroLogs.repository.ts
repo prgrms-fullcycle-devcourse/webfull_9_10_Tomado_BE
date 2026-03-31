@@ -33,7 +33,7 @@ export async function findRetroById(id: string): Promise<RetroLog | null> {
 export async function createRetro(
     data: {
         userId: string;
-        dailyLogId: string;
+        dailyLogId: string | null;
         retroDate: Date;
         templateType: string;
         content: Prisma.InputJsonValue;

@@ -1572,7 +1572,7 @@ paths:
     post:
       tags: [RetroLogs]
       summary: 회고 생성
-      description: 회고 생성. 성공 시 `daily_focus_stats.has_retro_log = true` UPSERT.
+      description: 회고 생성. `daily_log_id` 없이도 생성 가능. 성공 시 `daily_focus_stats.has_retro_log = true` UPSERT.
       security:
         - BearerAuth: []
       requestBody:
@@ -1581,12 +1581,14 @@ paths:
           application/json:
             schema:
               type: object
-              required: [daily_log_id, retro_date, template_type, content]
+              required: [retro_date, template_type, content]
               properties:
                 daily_log_id:
                   type: string
                   format: uuid
+                  nullable: true
                   example: f6a7b8c9-d0e1-2345-f012-456789012345
+                  description: 연관 일일 로그 ID (선택)
                 retro_date:
                   type: string
                   format: date

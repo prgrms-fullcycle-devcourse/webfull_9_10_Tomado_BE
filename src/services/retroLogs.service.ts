@@ -104,7 +104,7 @@ export async function getRetro(
 export async function createRetro(
     userId: string,
     body: {
-        daily_log_id: string;
+        daily_log_id?: string | null;
         retro_date: string;
         template_type: unknown;
         content: unknown;
@@ -112,9 +112,9 @@ export async function createRetro(
 ): Promise<ReturnType<typeof serializeRetroLog>> {
     const { daily_log_id, retro_date, template_type, content } = body;
 
-    if (!daily_log_id || typeof daily_log_id !== 'string') {
-        throwCode('VALIDATION_ERROR', 'daily_log_id는 필수입니다.', 'daily_log_id');
-    }
+    const normalizedDailyLogId =
+        typeof daily_log_id === 'string' && daily_log_id.trim() !== '' ? daily_log_id.trim() : null;
+
     if (!retro_date || typeof retro_date !== 'string') {
         throwCode('VALIDATION_ERROR', 'retro_date는 필수입니다.', 'retro_date');
     }
@@ -127,13 +127,15 @@ export async function createRetro(
     }
     validateTemplateContent(template_type, content);
 
-    const dailyLog = await retroRepo.findDailyLogOwnedByUser(daily_log_id, userId);
-    if (!dailyLog) {
-        throwCode('NOT_FOUND', '해당 일일 로그가 존재하지 않습니다.');
-    }
+    if (normalizedDailyLogId !== null) {
+        const dailyLog = await retroRepo.findDailyLogOwnedByUser(normalizedDailyLogId, userId);
+        if (!dailyLog) {
+            throwCode('NOT_FOUND', '해당 일일 로그가 존재하지 않습니다.');
+        }
 
-    if (retroRepo.toIsoDate(dailyLog.logDate) !== retro_date) {
-        throwCode('VALIDATION_ERROR', 'retro_date는 연결된 일일 로그의 날짜와 같아야 합니다.', 'retro_date');
+        if (retroRepo.toIsoDate(dailyLog.logDate) !== retro_date) {
+            throwCode('VALIDATION_ERROR', 'retro_date는 연결된 일일 로그의 날짜와 같아야 합니다.', 'retro_date');
+        }
     }
 
     const existing = await retroRepo.findRetroByUserAndRetroDate(userId, new Date(retro_date));
@@ -145,7 +147,7 @@ export async function createRetro(
         const created = await retroRepo.createRetro(
             {
                 userId,
-                dailyLogId: daily_log_id,
+                dailyLogId: normalizedDailyLogId,
                 retroDate: new Date(retro_date),
                 templateType: template_type,
                 content: content as Prisma.InputJsonValue,

@@ -1801,7 +1801,7 @@ paths:
  # ══════════════════════════════════════
   # 7. STATS
   # ══════════════════════════════════════
-  api/v1/stats/overview:
+  /api/v1/stats/overview:
     get:
       tags: [Stats]
       summary: 누적 기록 조회
@@ -1839,7 +1839,7 @@ paths:
         '401':
           $ref: '#/components/responses/Unauthorized'
 
-  api/v1/stats/heatmap:
+  /api/v1/stats/heatmap:
     get:
       tags: [Stats]
       summary: 히트맵 데이터 조회
@@ -1858,7 +1858,7 @@ paths:
         '401':
           $ref: '#/components/responses/Unauthorized'
 
-  api/v1/stats/heatmap-summary:
+  /api/v1/stats/heatmap-summary:
     get:
       tags: [Stats]
       summary: 히트맵 상단 통계 조회

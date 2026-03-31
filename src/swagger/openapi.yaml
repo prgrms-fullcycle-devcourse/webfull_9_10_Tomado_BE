@@ -339,8 +339,7 @@ components:
           enum: [Tech, Decision, Communication, Emotion]
           example: Tech
         content:
-          type: object
-          description: template_type에 따라 content 템플릿 키가 달라집니다.
+          description: template_type(Tech|Decision|Communication|Emotion)에 따라 아래 oneOf 중 하나의 객체 형태입니다.
           oneOf:
             - type: object
               description: Tech — learned today, applied tech, difficulty, next try
@@ -429,6 +428,11 @@ components:
                   type: string
                   description: What you are grateful for
                   example: Clear code review comments that sped up the fix.
+          example:
+            learned_today: Learned Prisma $transaction for atomic create + stats update.
+            applied_technology: Applied Prisma.DbNull for optional JSON null updates.
+            technical_difficulty: Json field null typing errors during PATCH.
+            next_to_try: Experiment with DB indexing for retro content search.
         is_dirty:
           type: boolean
           example: false

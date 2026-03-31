@@ -1082,7 +1082,7 @@ paths:
   # ══════════════════════════════════════
   # 4. POMODORO
   # ══════════════════════════════════════
-  /pomodoro/sessions:
+  /api/v1/pomodoro/sessions:
     post:
       tags: [Pomodoro]
       summary: 세션 시작
@@ -1179,7 +1179,7 @@ paths:
         '401':
           $ref: '#/components/responses/Unauthorized'
 
-  /pomodoro/sessions/{id}/end:
+  /api/v1/pomodoro/sessions/{id}/end:
     patch:
       tags: [Pomodoro]
       summary: 세션 종료
@@ -1243,7 +1243,7 @@ paths:
   # ══════════════════════════════════════
   # 5. DAILY LOGS
   # ══════════════════════════════════════
-  /daily-logs:
+  /api/v1/daily-logs:
     get:
       tags: [DailyLogs]
       summary: 날짜별 데일리 로그 조회
@@ -1327,7 +1327,7 @@ paths:
         '401':
           $ref: '#/components/responses/Unauthorized'
 
-  /daily-logs/list:
+  /api/v1/daily-logs/list:
     get:
       tags: [DailyLogs]
       summary: 기간별 로그 목록 조회
@@ -1361,16 +1361,18 @@ paths:
               example:
                 - id: f6a7b8c9-d0e1-2345-f012-456789012345
                   log_date: '2026-06-10'
+                  title: '오늘의 개발 일지'
                   tags: [backend, docs]
                   has_retro_log: true
                 - id: a7b8c9d0-e1f2-3456-0123-567890123456
                   log_date: '2026-06-11'
+                  title: '내일을 위한 준비'
                   tags: [frontend]
                   has_retro_log: false
         '401':
           $ref: '#/components/responses/Unauthorized'
 
-  /daily-logs/search:
+  /api/v1/daily-logs/search:
     get:
       tags: [DailyLogs]
       summary: 데일리 로그 검색
@@ -1425,7 +1427,7 @@ paths:
         '401':
           $ref: '#/components/responses/Unauthorized'
 
-  /daily-logs/{id}:
+  /api/v1/daily-logs/{id}:
     patch:
       tags: [DailyLogs]
       summary: 데일리 로그 수정
@@ -1799,7 +1801,7 @@ paths:
   # ══════════════════════════════════════
   # 7. STATS
   # ══════════════════════════════════════
-  /stats/heatmap:
+  /api/v1/stats/heatmap:
     get:
       tags: [Stats]
       summary: 히트맵 데이터 조회
@@ -1844,7 +1846,7 @@ paths:
         '401':
           $ref: '#/components/responses/Unauthorized'
 
-  /stats/calendar:
+  /api/v1/stats/calendar:
     get:
       tags: [Stats]
       summary: 달력 배지 데이터 조회
@@ -1902,7 +1904,7 @@ paths:
         '401':
           $ref: '#/components/responses/Unauthorized'
 
-  /stats/summary:
+  /api/v1/stats/summary:
     get:
       tags: [Stats]
       summary: 대시보드 요약 조회

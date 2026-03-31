@@ -6,6 +6,7 @@ import todosRouter from './routes/todos.routes.js';
 import { authRouter } from './routes/auth.routes.js';
 import usersRouter from './routes/users.routes.js';
 import pomodoroRouter from './routes/pomodoro.routes.js';
+import statsRouter from './routes/stats.routes.js';
 
 export function createApp() {
     const app = express();
@@ -23,6 +24,7 @@ export function createApp() {
     app.use('/api/v1/users', usersRouter);
     app.use('/api/v1/todos', todosRouter);
     app.use('/pomodoro', pomodoroRouter);
+    app.use('/stats', statsRouter);
 
     return app;
 }

@@ -6,6 +6,7 @@ import todosRouter from './routes/todos.routes.js';
 import { authRouter } from './routes/auth.routes.js';
 import usersRouter from './routes/users.routes.js';
 import pomodoroRouter from './routes/pomodoro.routes.js';
+import retroLogsRouter from './routes/retroLogs.routes.js';
 
 export function createApp() {
     const app = express();
@@ -19,10 +20,11 @@ export function createApp() {
     app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
     // 라우터 등록
-    app.use('/auth', authRouter);
+    app.use('/api/v1/auth', authRouter);
     app.use('/api/v1/users', usersRouter);
     app.use('/api/v1/todos', todosRouter);
     app.use('/pomodoro', pomodoroRouter);
+    app.use('/api/v1/retro-logs', retroLogsRouter);
 
     return app;
 }

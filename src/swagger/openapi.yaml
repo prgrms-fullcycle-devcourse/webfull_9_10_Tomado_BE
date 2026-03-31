@@ -1798,32 +1798,54 @@ paths:
         '404':
           $ref: '#/components/responses/NotFound'
 
-  # ══════════════════════════════════════
+ # ══════════════════════════════════════
   # 7. STATS
   # ══════════════════════════════════════
-  /api/v1/stats/heatmap:
+  api/v1/stats/overview:
+    get:
+      tags: [Stats]
+      summary: 누적 기록 조회
+      description: 회원가입부터 현재까지의 누적 통계 및 연속 스트릭 조회.
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: 누적 기록 조회 성공
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  streak:
+                    type: integer
+                    example: 12
+                    description: 연속 스트릭 (일)
+                  total_sessions:
+                    type: integer
+                    example: 342
+                    description: 총 포모도로 세션 수
+                  total_focus_sec:
+                    type: integer
+                    example: 615600
+                    description: 총 집중 시간 (초)
+                  total_daily_logs:
+                    type: integer
+                    example: 28
+                    description: 총 데일리로그 수
+                  total_retro_logs:
+                    type: integer
+                    example: 12
+                    description: 총 회고 수
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  api/v1/stats/heatmap:
     get:
       tags: [Stats]
       summary: 히트맵 데이터 조회
-      description: GitHub 잔디 스타일 히트맵용 일별 집중 시간 데이터 조회. 최대 365일 조회 가능.
+      description: 최근 1년간의 잔디 데이터 조회. 날짜 파라미터 불필요.
       security:
         - BearerAuth: []
-      parameters:
-        - name: start_date
-          in: query
-          required: true
-          schema:
-            type: string
-            format: date
-          example: '2026-01-01'
-        - name: end_date
-          in: query
-          required: true
-          schema:
-            type: string
-            format: date
-          example: '2026-06-30'
-          description: 최대 start + 365일
       responses:
         '200':
           description: 히트맵 데이터 조회 성공
@@ -1833,16 +1855,36 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/DailyFocusStat'
-        '400':
-          description: 날짜 범위 365일 초과 또는 형식 오류
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  api/v1/stats/heatmap-summary:
+    get:
+      tags: [Stats]
+      summary: 히트맵 상단 통계 조회
+      description: 최근 1년간의 포모도로, 집중시간, 일평균 포모도로 조회.
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: 히트맵 상단 통계 조회 성공
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Error'
-              example:
-                error:
-                  code: VALIDATION_ERROR
-                  message: 조회 기간은 최대 365일입니다.
+                type: object
+                properties:
+                  total_sessions:
+                    type: integer
+                    example: 289
+                    description: 연간 포모도로 수
+                  total_focus_sec:
+                    type: integer
+                    example: 520200
+                    description: 연간 집중 시간 (초)
+                  daily_avg_sessions:
+                    type: number
+                    example: 3.9
+                    description: 일평균 포모도로 수
         '401':
           $ref: '#/components/responses/Unauthorized'
 
@@ -1904,153 +1946,3 @@ paths:
         '401':
           $ref: '#/components/responses/Unauthorized'
 
-  /api/v1/stats/summary:
-    get:
-      tags: [Stats]
-      summary: 대시보드 요약 조회
-      description: 오늘 / 이번 주 / 이번 달 집중 시간 요약. 대시보드 상단 수치 표시용.
-      security:
-        - BearerAuth: []
-      parameters:
-        - name: date
-          in: query
-          required: true
-          schema:
-            type: string
-            format: date
-          example: '2026-06-10'
-          description: 기준 날짜 (오늘)
-      responses:
-        '200':
-          description: 요약 데이터 조회 성공
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  today:
-                    type: object
-                    properties:
-                      total_focus_sec:
-                        type: integer
-                        example: 3600
-                      completed_sessions:
-                        type: integer
-                        example: 2
-                      completed_todos:
-                        type: integer
-                        example: 3
-                  week:
-                    type: object
-                    properties:
-                      total_focus_sec:
-                        type: integer
-                        example: 25200
-                      completed_sessions:
-                        type: integer
-                        example: 14
-                  month:
-                    type: object
-                    properties:
-                      total_focus_sec:
-                        type: integer
-                        example: 108000
-                      completed_sessions:
-                        type: integer
-                        example: 60
-              example:
-                today:
-                  total_focus_sec: 3600
-                  completed_sessions: 2
-                  completed_todos: 3
-                week:
-                  total_focus_sec: 25200
-                  completed_sessions: 14
-                month:
-                  total_focus_sec: 108000
-                  completed_sessions: 60
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-
-  /stats/chart:
-    get:
-      tags: [Stats]
-      summary: 주/월간 차트 데이터 조회
-      description: 주간 또는 월간 집중 시간 바 차트 데이터 조회.
-      security:
-        - BearerAuth: []
-      parameters:
-        - name: period
-          in: query
-          required: true
-          schema:
-            type: string
-            enum: [week, month]
-          example: week
-        - name: date
-          in: query
-          required: true
-          schema:
-            type: string
-            format: date
-          example: '2026-06-10'
-          description: 기준 날짜
-      responses:
-        '200':
-          description: 차트 데이터 조회 성공
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  period:
-                    type: string
-                    example: week
-                  start_date:
-                    type: string
-                    format: date
-                    example: '2026-06-08'
-                  end_date:
-                    type: string
-                    format: date
-                    example: '2026-06-14'
-                  labels:
-                    type: array
-                    items:
-                      type: string
-                    example: [월, 화, 수, 목, 금, 토, 일]
-                  data:
-                    type: array
-                    items:
-                      type: integer
-                    example: [3600, 5400, 7200, 1800, 4500, 0, 2700]
-              examples:
-                week:
-                  summary: 주간 조회
-                  value:
-                    period: week
-                    start_date: '2026-06-08'
-                    end_date: '2026-06-14'
-                    labels: [월, 화, 수, 목, 금, 토, 일]
-                    data: [3600, 5400, 7200, 1800, 4500, 0, 2700]
-                month:
-                  summary: 월간 조회
-                  value:
-                    period: month
-                    start_date: '2026-06-01'
-                    end_date: '2026-06-30'
-                    labels: ['1', '2', '3', '...', '30']
-                    data: [5400, 3600, 0, '...', 7200]
-        '400':
-          description: period 값 오류 또는 날짜 형식 오류
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-              example:
-                error:
-                  code: VALIDATION_ERROR
-                  message: period는 week 또는 month여야 합니다.
-                  field: period
-        '401':
-          $ref: '#/components/responses/Unauthorized'

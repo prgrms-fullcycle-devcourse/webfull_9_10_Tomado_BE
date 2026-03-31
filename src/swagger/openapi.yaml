@@ -1273,10 +1273,12 @@ paths:
               example:
                 - id: f6a7b8c9-d0e1-2345-f012-456789012345
                   log_date: '2026-06-10'
+                  title: '오늘의 개발 일지'
                   tags: [backend, docs]
                   has_retro_log: true
                 - id: a7b8c9d0-e1f2-3456-0123-567890123456
                   log_date: '2026-06-11'
+                  title: '내일을 위한 준비'
                   tags: [frontend]
                   has_retro_log: false
         '401':

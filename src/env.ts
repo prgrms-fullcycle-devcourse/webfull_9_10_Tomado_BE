@@ -10,6 +10,7 @@ const EnvSchema = z.object({
     SUPABASE_URL: z.string().url(),
     SUPABASE_ANON_KEY: z.string().min(1),
     SUPABASE_SERVICE_ROLE_KEY: z.string().min(1),
+    ALLOWED_ORIGINS: z.string().default('http://localhost:5173'), // TODO: 배포 시 변경(주소가 들어오지 않을 경우 임시로 로컬주소 허용)
 });
 
 const parsed = EnvSchema.safeParse(process.env);

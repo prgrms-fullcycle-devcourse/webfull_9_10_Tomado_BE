@@ -1,5 +1,6 @@
 import cors from 'cors';
 import express from 'express';
+import { env } from './env.js';
 import swaggerUi from 'swagger-ui-express';
 import swaggerSpec from './swagger/index.js';
 import todosRouter from './routes/todos.routes.js';
@@ -12,7 +13,12 @@ import retroLogsRouter from './routes/retroLogs.routes.js';
 export function createApp() {
     const app = express();
 
-    app.use(cors());
+    app.use(
+        cors({
+            origin: env.ALLOWED_ORIGINS.split(','),
+            credentials: true,
+        })
+    );
     app.use(express.json());
 
     // Health Check

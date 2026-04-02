@@ -1529,7 +1529,7 @@ paths:
     get:
       tags: [RetroLogs]
       summary: 회고 조회
-      description: `daily_log_id`와 `date`(YYYY-MM-DD)로 회고 조회. 두 쿼리 파라미터 모두 필수.
+      description: "`daily_log_id`와 `date`(YYYY-MM-DD)로 회고 조회. 두 쿼리 파라미터 모두 필수."
       security:
         - BearerAuth: []
       parameters:

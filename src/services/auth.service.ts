@@ -2,6 +2,7 @@ import { Prisma } from '@prisma/client';
 import { z } from 'zod';
 
 import { AuthHttpError } from '../lib/authErrors.js';
+import { serializeUser } from '../lib/apiSerializers.js';
 import { supabaseAdmin, supabaseClient } from '../lib/supabase.js';
 import * as authRepo from '../repositories/auth.repository.js';
 
@@ -36,24 +37,6 @@ function mapZodError(e: z.ZodError): AuthHttpError {
     }
     const field = first.path[0] != null ? String(first.path[0]) : undefined;
     return new AuthHttpError(400, 'VALIDATION_ERROR', first.message, field);
-}
-
-function serializeUser(u: {
-    id: string;
-    loginId: string;
-    nickname: string | null;
-    avatarUrl: string | null;
-    createdAt: Date;
-    updatedAt: Date;
-}) {
-    return {
-        id: u.id,
-        login_id: u.loginId,
-        nickname: u.nickname,
-        avatar_url: u.avatarUrl,
-        created_at: u.createdAt.toISOString(),
-        updated_at: u.updatedAt.toISOString(),
-    };
 }
 
 function loginIdToEmail(loginId: string) {

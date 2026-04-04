@@ -1,3 +1,4 @@
+import { serializeDailyFocusStat } from '../lib/apiSerializers.js';
 import * as statsRepository from '../repositories/stats.repository.js';
 
 // 스트릭 계산 함수
@@ -40,12 +41,18 @@ export const getOverallStats = async (userId: string) => {
 
 // 히트맵 페이지 상단 통계
 export const getHeatmapSummary = async (userId: string) => {
-    return statsRepository.findHeatmapSummary(userId);
+    const result = await statsRepository.findHeatmapSummary(userId);
+    return {
+        total_sessions: result.totalSessions,
+        total_focus_sec: result.totalFocusSec,
+        daily_avg_sessions: result.dailyAvgSessions,
+    };
 };
 
 // 히트맵 데이터
 export const getHeatmap = async (userId: string) => {
-    return statsRepository.findHeatmap(userId);
+    const stats = await statsRepository.findHeatmap(userId);
+    return stats.map(serializeDailyFocusStat);
 };
 
 // 달력 데이터
@@ -57,5 +64,6 @@ export const getCalendar = async (userId: string, year: number, month: number) =
         throw err;
     }
 
-    return statsRepository.findCalendar(userId, year, month);
+    const stats = await statsRepository.findCalendar(userId, year, month);
+    return stats.map(serializeDailyFocusStat);
 };

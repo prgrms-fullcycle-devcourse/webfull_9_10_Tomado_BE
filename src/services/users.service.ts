@@ -1,3 +1,4 @@
+import { serializeUser, serializeUserSetting } from '../lib/apiSerializers.js';
 import * as usersRepository from '../repositories/users.repository.js';
 
 // 내 프로필 조회
@@ -8,7 +9,7 @@ export async function getMyProfile(userId: string) {
         throw new Error('NOT_FOUND');
     }
 
-    return user;
+    return serializeUser(user);
 }
 
 // 내 프로필 수정
@@ -20,10 +21,11 @@ export async function updateMyProfile(userId: string, data: { nickname?: string;
     }
 
     // API 명세서의 avatar_url을 Prisma 모델의 avatarUrl로 변환
-    return usersRepository.updateUser(userId, {
+    const updated = await usersRepository.updateUser(userId, {
         nickname: data.nickname,
         avatarUrl: data.avatar_url,
     });
+    return serializeUser(updated);
 }
 
 // 내 앱 설정 조회
@@ -34,7 +36,7 @@ export async function getMySettings(userId: string) {
         throw new Error('NOT_FOUND');
     }
 
-    return settings;
+    return serializeUserSetting(settings);
 }
 
 // 내 앱 설정 수정
@@ -55,13 +57,14 @@ export async function updateMySettings(
     }
 
     // API 명세서의 snake_case를 Prisma 모델의 camelCase로 변환
-    return usersRepository.updateSetting(userId, {
+    const updated = await usersRepository.updateSetting(userId, {
         focusMin: data.focus_min,
         shortBreakMin: data.short_break_min,
         longBreakMin: data.long_break_min,
         sessionsPerSet: data.sessions_per_set,
         autoCarryTodo: data.auto_carry_todo,
     });
+    return serializeUserSetting(updated);
 }
 
 // 회원 탈퇴

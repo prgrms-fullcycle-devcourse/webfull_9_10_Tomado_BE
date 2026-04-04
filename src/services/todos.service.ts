@@ -1,7 +1,9 @@
+import { serializeTodo } from '../lib/apiSerializers.js';
 import * as todosRepository from '../repositories/todos.repository.js';
 
 export const getTodos = async (userId: string, assignedDate: string) => {
-    return todosRepository.findTodosByDate(userId, assignedDate);
+    const todos = await todosRepository.findTodosByDate(userId, assignedDate);
+    return todos.map(serializeTodo);
 };
 
 export const createTodo = async (
@@ -16,13 +18,14 @@ export const createTodo = async (
     const maxOrder = await todosRepository.findMaxSortOrder(userId, body.assigned_date);
     const sortOrder = maxOrder + 1.0;
 
-    return todosRepository.createTodo({
+    const todo = await todosRepository.createTodo({
         userId,
         title: body.title,
         description: body.description,
         assignedDate: body.assigned_date,
         sortOrder,
     });
+    return serializeTodo(todo);
 };
 
 export const deleteTodo = async (userId: string, todoId: string) => {
@@ -65,11 +68,12 @@ export const updateTodo = async (
         throw err;
     }
 
-    return todosRepository.updateTodo(todoId, {
+    const updated = await todosRepository.updateTodo(todoId, {
         title: body.title,
         description: body.description,
         assignedDate: body.assigned_date,
     });
+    return serializeTodo(updated);
 };
 
 export const toggleComplete = async (userId: string, todoId: string, completed: boolean) => {
@@ -86,7 +90,8 @@ export const toggleComplete = async (userId: string, todoId: string, completed: 
         throw err;
     }
 
-    return todosRepository.toggleTodoComplete(todoId, completed);
+    const updated = await todosRepository.toggleTodoComplete(todoId, completed);
+    return serializeTodo(updated);
 };
 
 export const reorderTodo = async (
@@ -123,5 +128,6 @@ export const reorderTodo = async (
         newOrder = (prevOrder! + nextOrder!) / 2;
     }
 
-    return todosRepository.reorderTodo(todoId, newOrder);
+    const updated = await todosRepository.reorderTodo(todoId, newOrder);
+    return serializeTodo(updated);
 };

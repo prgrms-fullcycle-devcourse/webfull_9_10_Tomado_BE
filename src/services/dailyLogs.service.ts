@@ -1,3 +1,4 @@
+import { serializeDailyLog } from '../lib/apiSerializers.js';
 import * as dailyLogsRepository from '../repositories/dailyLogs.repository.js';
 
 const createError = (status: number, code: string, message: string) => {
@@ -35,7 +36,7 @@ export const createLog = async (
         tags: data.tags,
     });
 
-    return log;
+    return serializeDailyLog(log);
 };
 
 // 특정 날짜 로그 조회
@@ -44,7 +45,7 @@ export const getLogByDate = async (userId: string, date: string) => {
     if (!log) {
         throw createError(404, 'NOT_FOUND', `${date} 날짜의 데일리 로그가 존재하지 않습니다.`);
     }
-    return log;
+    return serializeDailyLog(log);
 };
 
 // 기간별 목록 조회
@@ -97,13 +98,14 @@ export const updateLog = async (
     if (!existing) throw createError(404, 'NOT_FOUND', '해당 로그를 찾을 수 없습니다.');
     if (existing.userId !== userId) throw createError(403, 'FORBIDDEN', '본인의 로그만 수정할 수 있습니다.');
 
-    return await dailyLogsRepository.updateDailyLog(id, {
+    const updated = await dailyLogsRepository.updateDailyLog(id, {
         title: data.title,
         content: data.content,
         tags: data.tags,
         isDirty: data.is_dirty,
         draftContent: data.draft_content,
     });
+    return serializeDailyLog(updated);
 };
 
 // 로그 삭제

@@ -1,3 +1,4 @@
+import { serializePomodoroSession } from '../lib/apiSerializers.js';
 import * as pomodoroRepository from '../repositories/pomodoro.repository.js';
 
 const VALID_TYPES = ['focus', 'short_break', 'long_break'];
@@ -16,10 +17,11 @@ export const createSession = async (userId: string, body: { type: string }) => {
         throw createError('VALIDATION_ERROR', 'type은 focus, short_break, long_break 중 하나여야 합니다.', 'type');
     }
 
-    return pomodoroRepository.createSession({
+    const session = await pomodoroRepository.createSession({
         userId,
         type: body.type,
     });
+    return serializePomodoroSession(session);
 };
 
 // 세션 종료
@@ -50,7 +52,7 @@ export const endSession = async (
         );
     }
 
-    return ended;
+    return serializePomodoroSession(ended);
 };
 
 // 세션 목록 조회
@@ -62,5 +64,6 @@ export const getSessions = async (userId: string, startDate: string, endDate: st
         throw createError('VALIDATION_ERROR', 'type은 focus, short_break, long_break 중 하나여야 합니다.', 'type');
     }
 
-    return pomodoroRepository.findSessinos(userId, startDate, endDate, type);
+    const sessions = await pomodoroRepository.findSessinos(userId, startDate, endDate, type);
+    return sessions.map(serializePomodoroSession);
 };

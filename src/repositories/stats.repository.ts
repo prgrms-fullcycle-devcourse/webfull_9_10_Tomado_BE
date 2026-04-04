@@ -58,9 +58,9 @@ export const findHeatmapSummary = async (userId: string) => {
     const activeDays = result._count.focusDate ?? 0;
 
     return {
-        total_sessions: totalSessions,
-        total_focus_sec: totalFocusSec,
-        daily_avg_sessions: activeDays > 0 ? Math.round((totalSessions / activeDays) * 10) / 10 : 0,
+        totalSessions,
+        totalFocusSec,
+        dailyAvgSessions: activeDays > 0 ? Math.round((totalSessions / activeDays) * 10) / 10 : 0,
     };
 };
 

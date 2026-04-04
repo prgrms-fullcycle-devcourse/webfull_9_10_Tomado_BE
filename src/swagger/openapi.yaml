@@ -310,19 +310,19 @@ components:
         id:
           type: string
           format: uuid
-        log_date:
+        logDate:
           type: string
           format: date
         title:
           type: string
-        content_preview:
+        contentPreview:
           type: string
           description: 검색어 앞뒤 50자
         tags:
           type: array
           items:
             type: string
-        has_retro_log:
+        hasRetroLog:
           type: boolean
 
     CreateRetroLogRequest:
@@ -377,17 +377,17 @@ components:
         id:
           type: string
           format: uuid
-        daily_log_id:
+        dailyLogId:
           type: string
           format: uuid
           nullable: true
-        retro_date:
+        retroDate:
           type: string
           format: date
-        template_type:
+        templateType:
           type: string
           enum: [Tech, Decision, Communication, Emotion]
-        content_preview:
+        contentPreview:
           type: string
           description: 검색어 앞뒤 50자
 
@@ -398,19 +398,19 @@ components:
           type: integer
           example: 12
           description: 연속 스트릭 (일)
-        total_sessions:
+        totalSessions:
           type: integer
           example: 342
           description: 총 포모도로 세션 수
-        total_focus_sec:
+        totalFocusSec:
           type: integer
           example: 615600
           description: 총 집중 시간 (초)
-        total_daily_logs:
+        totalDailyLogs:
           type: integer
           example: 28
           description: 총 데일리로그 수
-        total_retro_logs:
+        totalRetroLogs:
           type: integer
           example: 12
           description: 총 회고 수
@@ -418,15 +418,15 @@ components:
     StatsHeatmapSummaryResponse:
       type: object
       properties:
-        total_sessions:
+        totalSessions:
           type: integer
           example: 289
           description: 연간 포모도로 수
-        total_focus_sec:
+        totalFocusSec:
           type: integer
           example: 520200
           description: 연간 집중 시간 (초)
-        daily_avg_sessions:
+        dailyAvgSessions:
           type: number
           example: 3.9
           description: 일평균 포모도로 수
@@ -438,21 +438,21 @@ components:
           type: string
           format: uuid
           example: a1b2c3d4-e5f6-7890-abcd-ef1234567890
-        login_id:
+        loginId:
           type: string
           example: devjohn
         nickname:
           type: string
           example: 존개발
-        avatar_url:
+        avatarUrl:
           type: string
           nullable: true
           example: https://cdn.tomado.io/avatars/devjohn.png
-        created_at:
+        createdAt:
           type: string
           format: date-time
           example: '2026-01-15T09:00:00Z'
-        updated_at:
+        updatedAt:
           type: string
           format: date-time
           example: '2026-06-01T12:00:00Z'
@@ -464,34 +464,34 @@ components:
           type: string
           format: uuid
           example: b2c3d4e5-f6a7-8901-bcde-f12345678901
-        user_id:
+        userId:
           type: string
           format: uuid
           example: a1b2c3d4-e5f6-7890-abcd-ef1234567890
-        focus_min:
+        focusMin:
           type: integer
           minimum: 1
           maximum: 120
           example: 25
-        short_break_min:
+        shortBreakMin:
           type: integer
           minimum: 1
           maximum: 30
           example: 5
-        long_break_min:
+        longBreakMin:
           type: integer
           minimum: 1
           maximum: 60
           example: 15
-        sessions_per_set:
+        sessionsPerSet:
           type: integer
           minimum: 1
           maximum: 10
           example: 4
-        auto_carry_todo:
+        autoCarryTodo:
           type: boolean
           example: true
-        updated_at:
+        updatedAt:
           type: string
           format: date-time
           example: '2026-06-01T12:00:00Z'
@@ -503,7 +503,7 @@ components:
           type: string
           format: uuid
           example: c3d4e5f6-a7b8-9012-cdef-123456789012
-        user_id:
+        userId:
           type: string
           format: uuid
           example: a1b2c3d4-e5f6-7890-abcd-ef1234567890
@@ -514,24 +514,24 @@ components:
           type: string
           nullable: true
           example: 인증/투두/포모도로 엔드포인트 정의
-        assigned_date:
+        assignedDate:
           type: string
           format: date
           example: '2026-06-10'
-        sort_order:
+        sortOrder:
           type: number
           format: float
           example: 3.0
-        completed_at:
+        completedAt:
           type: string
           format: date-time
           nullable: true
           example: null
-        created_at:
+        createdAt:
           type: string
           format: date-time
           example: '2026-06-10T09:00:00Z'
-        updated_at:
+        updatedAt:
           type: string
           format: date-time
           example: '2026-06-10T09:00:00Z'
@@ -543,7 +543,7 @@ components:
           type: string
           format: uuid
           example: d4e5f6a7-b8c9-0123-def0-234567890123
-        user_id:
+        userId:
           type: string
           format: uuid
           example: a1b2c3d4-e5f6-7890-abcd-ef1234567890
@@ -556,24 +556,24 @@ components:
           enum: [completed, cancelled]
           nullable: true
           example: completed
-        actual_sec:
+        actualSec:
           type: integer
           nullable: true
           example: 1500
-        focus_date:
+        focusDate:
           type: string
           format: date
           example: '2026-06-10'
-        started_at:
+        startedAt:
           type: string
           format: date-time
           example: '2026-06-10T09:00:00Z'
-        ended_at:
+        endedAt:
           type: string
           format: date-time
           nullable: true
           example: '2026-06-10T09:25:00Z'
-        created_at:
+        createdAt:
           type: string
           format: date-time
           example: '2026-06-10T09:00:00Z'
@@ -585,11 +585,11 @@ components:
           type: string
           format: uuid
           example: f6a7b8c9-d0e1-2345-f012-456789012345
-        user_id:
+        userId:
           type: string
           format: uuid
           example: a1b2c3d4-e5f6-7890-abcd-ef1234567890
-        log_date:
+        logDate:
           type: string
           format: date
           example: '2026-06-10'
@@ -605,18 +605,18 @@ components:
           items:
             type: string
           example: [backend, docs]
-        is_dirty:
+        isDirty:
           type: boolean
           example: false
-        draft_content:
+        draftContent:
           type: string
           nullable: true
           example: null
-        created_at:
+        createdAt:
           type: string
           format: date-time
           example: '2026-06-10T09:00:00Z'
-        updated_at:
+        updatedAt:
           type: string
           format: date-time
           example: '2026-06-10T18:00:00Z'
@@ -628,7 +628,7 @@ components:
           type: string
           format: uuid
           example: f6a7b8c9-d0e1-2345-f012-456789012345
-        log_date:
+        logDate:
           type: string
           format: date
           example: '2026-06-10'
@@ -641,7 +641,7 @@ components:
           items:
             type: string
           example: [backend, docs]
-        has_retro_log:
+        hasRetroLog:
           type: boolean
           example: true
 
@@ -652,19 +652,19 @@ components:
           type: string
           format: uuid
           example: b8c9d0e1-f2a3-4567-0123-678901234567
-        user_id:
+        userId:
           type: string
           format: uuid
           example: a1b2c3d4-e5f6-7890-abcd-ef1234567890
-        daily_log_id:
+        dailyLogId:
           type: string
           format: uuid
           example: f6a7b8c9-d0e1-2345-f012-456789012345
-        retro_date:
+        retroDate:
           type: string
           format: date
           example: '2026-06-10'
-        template_type:
+        templateType:
           type: string
           enum: [Tech, Decision, Communication, Emotion]
           example: Tech
@@ -674,41 +674,41 @@ components:
             - type: object
               description: Tech — learned today, applied tech, difficulty, next try
               required:
-                [learned_today, applied_technology, technical_difficulty, next_to_try]
+                [learnedToday, appliedTechnology, technicalDifficulty, nextToTry]
               properties:
-                learned_today:
+                learnedToday:
                   type: string
                   description: Technology or concept learned today
                   example: Learned Prisma $transaction for atomic create + stats update.
-                applied_technology:
+                appliedTechnology:
                   type: string
                   description: Technology or approach applied today
                   example: Applied Prisma.DbNull for optional JSON null updates.
-                technical_difficulty:
+                technicalDifficulty:
                   type: string
                   description: Technical challenges faced
                   example: Json field null typing errors during PATCH.
-                next_to_try:
+                nextToTry:
                   type: string
                   description: What to try next
                   example: Experiment with DB indexing for retro content search.
             - type: object
               description: Decision — decision, reason, outcome, alternatives
-              required: [decision_made, decision_reason, outcome_impact, alternatives_considered]
+              required: [decisionMade, decisionReason, outcomeImpact, alternativesConsidered]
               properties:
-                decision_made:
+                decisionMade:
                   type: string
                   description: Decision made today
                   example: Require both date and daily_log_id for retro GET.
-                decision_reason:
+                decisionReason:
                   type: string
                   description: Why this decision
                   example: Clearer API contract and fewer ambiguous lookups.
-                outcome_impact:
+                outcomeImpact:
                   type: string
                   description: Results and impact
                   example: FE can rely on stable query shape; fewer support questions.
-                alternatives_considered:
+                alternativesConsidered:
                   type: string
                   description: Other options if any (e.g. "None" or listed alternatives)
                   example: 'Considered: date-only, id-only, or both required — chose both.'
@@ -716,21 +716,21 @@ components:
               description: Communication — wins, friction, feedback, improvements
               required:
                 [
-                  communication_highlights,
-                  communication_friction,
-                  feedback_received,
+                  communicationHighlights,
+                  communicationFriction,
+                  feedbackReceived,
                   improvements,
                 ]
               properties:
-                communication_highlights:
+                communicationHighlights:
                   type: string
                   description: Communication that went well
                   example: Retro API contract was aligned quickly in a short sync.
-                communication_friction:
+                communicationFriction:
                   type: string
                   description: Misunderstandings or friction
                   example: Initial doc said only one query param was required.
-                feedback_received:
+                feedbackReceived:
                   type: string
                   description: Feedback received from others
                   example: FE asked for explicit 400 errors when params are missing.
@@ -740,41 +740,41 @@ components:
                   example: Keep Swagger and Notion in sync when changing query rules.
             - type: object
               description: Emotion — mood, energizers, drains, gratitude
-              required: [mood_today, what_energized, what_drained, grateful_for]
+              required: [moodToday, whatEnergized, whatDrained, gratefulFor]
               properties:
-                mood_today:
+                moodToday:
                   type: string
                   description: Overall mood today
                   example: Tired but relieved after resolving merge conflicts.
-                what_energized:
+                whatEnergized:
                   type: string
                   description: What gave you energy
                   example: Pair debugging with a teammate.
-                what_drained:
+                whatDrained:
                   type: string
                   description: What drained your energy
                   example: Long context switching between auth and retro features.
-                grateful_for:
+                gratefulFor:
                   type: string
                   description: What you are grateful for
                   example: Clear code review comments that sped up the fix.
           example:
-            learned_today: Learned Prisma $transaction for atomic create + stats update.
-            applied_technology: Applied Prisma.DbNull for optional JSON null updates.
-            technical_difficulty: Json field null typing errors during PATCH.
-            next_to_try: Experiment with DB indexing for retro content search.
-        is_dirty:
+            learnedToday: Learned Prisma $transaction for atomic create + stats update.
+            appliedTechnology: Applied Prisma.DbNull for optional JSON null updates.
+            technicalDifficulty: Json field null typing errors during PATCH.
+            nextToTry: Experiment with DB indexing for retro content search.
+        isDirty:
           type: boolean
           example: false
-        draft_content:
+        draftContent:
           type: object
           nullable: true
           example: null
-        created_at:
+        createdAt:
           type: string
           format: date-time
           example: '2026-06-10T19:00:00Z'
-        updated_at:
+        updatedAt:
           type: string
           format: date-time
           example: '2026-06-10T19:30:00Z'
@@ -782,33 +782,33 @@ components:
     DailyFocusStat:
       type: object
       properties:
-        focus_date:
+        focusDate:
           type: string
           format: date
           example: '2026-06-10'
-        total_focus_sec:
+        totalFocusSec:
           type: integer
           example: 7200
-        completed_sessions:
+        completedSessions:
           type: integer
           example: 4
-        completed_todos:
+        completedTodos:
           type: integer
           example: 6
-        has_daily_log:
+        hasDailyLog:
           type: boolean
           example: true
-        has_retro_log:
+        hasRetroLog:
           type: boolean
           example: true
 
     AuthTokens:
       type: object
       properties:
-        access_token:
+        accessToken:
           type: string
           example: eyJhbGci...
-        refresh_token:
+        refreshToken:
           type: string
           example: eyJhbGci...
 
@@ -845,14 +845,14 @@ paths:
                       user:
                         $ref: '#/components/schemas/User'
               example:
-                access_token: eyJhbGci...
-                refresh_token: eyJhbGci...
+                accessToken: eyJhbGci...
+                refreshToken: eyJhbGci...
                 user:
                   id: a1b2c3d4-e5f6-7890-abcd-ef1234567890
-                  login_id: devjohn
+                  loginId: devjohn
                   nickname: 존개발
-                  avatar_url: null
-                  created_at: '2026-01-15T09:00:00Z'
+                  avatarUrl: null
+                  createdAt: '2026-01-15T09:00:00Z'
         '400':
           description: 유효성 검사 실패
           content:
@@ -900,14 +900,14 @@ paths:
                       user:
                         $ref: '#/components/schemas/User'
               example:
-                access_token: eyJhbGci...
-                refresh_token: eyJhbGci...
+                accessToken: eyJhbGci...
+                refreshToken: eyJhbGci...
                 user:
                   id: a1b2c3d4-e5f6-7890-abcd-ef1234567890
-                  login_id: devjohn
+                  loginId: devjohn
                   nickname: 존개발
-                  avatar_url: null
-                  created_at: '2026-01-15T09:00:00Z'
+                  avatarUrl: null
+                  createdAt: '2026-01-15T09:00:00Z'
         '401':
           description: 아이디 또는 비밀번호 불일치
           content:
@@ -939,8 +939,8 @@ paths:
               schema:
                 $ref: '#/components/schemas/AuthTokens'
               example:
-                access_token: eyJhbGci...새로운토큰
-                refresh_token: eyJhbGci...새로운토큰
+                accessToken: eyJhbGci...새로운토큰
+                refreshToken: eyJhbGci...새로운토큰
         '401':
           description: Refresh Token 만료 또는 무효
           content:
@@ -1252,19 +1252,19 @@ paths:
                   value:
                     id: c3d4e5f6-a7b8-9012-cdef-123456789012
                     title: API 명세서 작성
-                    assigned_date: '2026-06-10'
-                    sort_order: 3.0
-                    completed_at: '2026-06-10T14:30:00Z'
-                    updated_at: '2026-06-10T14:30:00Z'
+                    assignedDate: '2026-06-10'
+                    sortOrder: 3.0
+                    completedAt: '2026-06-10T14:30:00Z'
+                    updatedAt: '2026-06-10T14:30:00Z'
                 uncompleted:
                   summary: 완료 취소 시
                   value:
                     id: c3d4e5f6-a7b8-9012-cdef-123456789012
                     title: API 명세서 작성
-                    assigned_date: '2026-06-10'
-                    sort_order: 3.0
-                    completed_at: null
-                    updated_at: '2026-06-10T14:35:00Z'
+                    assignedDate: '2026-06-10'
+                    sortOrder: 3.0
+                    completedAt: null
+                    updatedAt: '2026-06-10T14:35:00Z'
         '404':
           $ref: '#/components/responses/NotFound'
 
@@ -1304,8 +1304,8 @@ paths:
               example:
                 id: c3d4e5f6-a7b8-9012-cdef-123456789012
                 title: API 명세서 작성
-                sort_order: 1.5
-                updated_at: '2026-06-10T11:00:00Z'
+                sortOrder: 1.5
+                updatedAt: '2026-06-10T11:00:00Z'
         '400':
           description: prev_order >= next_order 충돌
           content:
@@ -1343,14 +1343,14 @@ paths:
                 $ref: '#/components/schemas/PomodoroSession'
               example:
                 id: d4e5f6a7-b8c9-0123-def0-234567890123
-                user_id: a1b2c3d4-e5f6-7890-abcd-ef1234567890
+                userId: a1b2c3d4-e5f6-7890-abcd-ef1234567890
                 type: focus
                 status: null
-                actual_sec: null
-                focus_date: '2026-06-10'
-                started_at: '2026-06-10T09:00:00Z'
-                ended_at: null
-                created_at: '2026-06-10T09:00:00Z'
+                actualSec: null
+                focusDate: '2026-06-10'
+                startedAt: '2026-06-10T09:00:00Z'
+                endedAt: null
+                createdAt: '2026-06-10T09:00:00Z'
         '400':
           description: type 값 오류 또는 날짜 형식 오류
           content:
@@ -1566,15 +1566,15 @@ paths:
                   $ref: '#/components/schemas/DailyLogSummary'
               example:
                 - id: f6a7b8c9-d0e1-2345-f012-456789012345
-                  log_date: '2026-06-10'
+                  logDate: '2026-06-10'
                   title: '오늘의 개발 일지'
                   tags: [backend, docs]
-                  has_retro_log: true
+                  hasRetroLog: true
                 - id: a7b8c9d0-e1f2-3456-0123-567890123456
-                  log_date: '2026-06-11'
+                  logDate: '2026-06-11'
                   title: '내일을 위한 준비'
                   tags: [frontend]
-                  has_retro_log: false
+                  hasRetroLog: false
         '401':
           $ref: '#/components/responses/Unauthorized'
 
@@ -2052,18 +2052,18 @@ paths:
                 items:
                   $ref: '#/components/schemas/DailyFocusStat'
               example:
-                - focus_date: '2026-06-01'
-                  total_focus_sec: 5400
-                  completed_sessions: 3
-                  completed_todos: 4
-                  has_daily_log: true
-                  has_retro_log: false
-                - focus_date: '2026-06-10'
-                  total_focus_sec: 7200
-                  completed_sessions: 4
-                  completed_todos: 6
-                  has_daily_log: true
-                  has_retro_log: true
+                - focusDate: '2026-06-01'
+                  totalFocusSec: 5400
+                  completedSessions: 3
+                  completedTodos: 4
+                  hasDailyLog: true
+                  hasRetroLog: false
+                - focusDate: '2026-06-10'
+                  totalFocusSec: 7200
+                  completedSessions: 4
+                  completedTodos: 6
+                  hasDailyLog: true
+                  hasRetroLog: true
         '400':
           description: month 범위 오류
           content:

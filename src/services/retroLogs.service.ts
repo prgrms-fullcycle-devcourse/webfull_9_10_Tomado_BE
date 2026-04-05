@@ -77,23 +77,52 @@ export function buildContentPreview(content: unknown, q: string): string {
 
 export async function getRetro(
     userId: string,
-    query: { date?: string; daily_log_id?: string }
+    query: { date?: string; daily_log_id?: string; template_type?: string }
 ): Promise<ReturnType<typeof serializeRetroLog>> {
     const date = query.date?.trim();
     const daily_log_id = query.daily_log_id?.trim();
+    const template_type_raw = query.template_type?.trim();
 
     if (!date) {
         throwCode('VALIDATION_ERROR', 'date는 필수입니다.', 'date');
     }
-    if (!daily_log_id) {
-        throwCode('VALIDATION_ERROR', 'daily_log_id는 필수입니다.', 'daily_log_id');
+
+    if (!daily_log_id && !template_type_raw) {
+        throwCode('VALIDATION_ERROR', 'daily_log_id 또는 template_type 중 하나는 필수입니다.', 'daily_log_id');
     }
 
-    const row = await retroRepo.findRetroByUserAndDailyLogId(userId, daily_log_id);
-    if (row && retroRepo.toIsoDate(row.retroDate) !== date) {
-        throwCode('VALIDATION_ERROR', 'date와 연결된 회고의 retro_date가 일치하지 않습니다.', 'date');
+    if (daily_log_id) {
+        const row = await retroRepo.findRetroByUserAndDailyLogId(userId, daily_log_id);
+        if (!row) {
+            throwCode('NOT_FOUND', '해당 날짜의 회고가 존재하지 않습니다.');
+        }
+        if (retroRepo.toIsoDate(row.retroDate) !== date) {
+            throwCode('VALIDATION_ERROR', 'date와 연결된 회고의 retro_date가 일치하지 않습니다.', 'date');
+        }
+        if (template_type_raw) {
+            if (!isTemplateType(template_type_raw)) {
+                throwCode(
+                    'VALIDATION_ERROR',
+                    'template_type은 Tech, Decision, Communication, Emotion 중 하나여야 합니다.',
+                    'template_type'
+                );
+            }
+            if (row.templateType !== template_type_raw) {
+                throwCode('NOT_FOUND', '해당 날짜의 회고가 존재하지 않습니다.');
+            }
+        }
+        return serializeRetroLog(row);
     }
 
+    if (!isTemplateType(template_type_raw)) {
+        throwCode(
+            'VALIDATION_ERROR',
+            'template_type은 Tech, Decision, Communication, Emotion 중 하나여야 합니다.',
+            'template_type'
+        );
+    }
+
+    const row = await retroRepo.findRetroByUserDateAndTemplate(userId, new Date(date), template_type_raw);
     if (!row) {
         throwCode('NOT_FOUND', '해당 날짜의 회고가 존재하지 않습니다.');
     }
@@ -138,12 +167,17 @@ export async function createRetro(
         }
     }
 
-    const existing = await retroRepo.findRetroByUserAndRetroDate(userId, new Date(retro_date));
-    if (existing) {
-        throwCode('CONFLICT', `${retro_date} 날짜의 회고가 이미 존재합니다.`);
-    }
-
     const row = await prisma.$transaction(async (tx) => {
+        const existing = await retroRepo.findRetroByUserDateAndTemplate(
+            userId,
+            new Date(retro_date),
+            template_type,
+            tx
+        );
+        if (existing) {
+            throwCode('CONFLICT', `${retro_date} 날짜에 ${template_type} 템플릿 회고가 이미 존재합니다.`);
+        }
+
         const created = await retroRepo.createRetro(
             {
                 userId,
@@ -232,6 +266,7 @@ export async function deleteRetro(userId: string, id: string): Promise<void> {
     const focusDate = row.retroDate;
     await prisma.$transaction(async (tx) => {
         await retroRepo.deleteRetro(id, tx);
-        await retroRepo.upsertDailyFocusStatHasRetro(userId, focusDate, false, tx);
+        const remaining = await retroRepo.countRetrosByUserAndDate(userId, focusDate, tx);
+        await retroRepo.upsertDailyFocusStatHasRetro(userId, focusDate, remaining > 0, tx);
     });
 }

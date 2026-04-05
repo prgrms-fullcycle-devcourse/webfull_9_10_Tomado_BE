@@ -14,8 +14,19 @@ export async function findDailyLogOwnedByUser(dailyLogId: string, userId: string
     });
 }
 
-export async function findRetroByUserAndRetroDate(userId: string, retroDate: Date): Promise<RetroLog | null> {
-    return prisma.retroLog.findFirst({
+export async function findRetroByUserDateAndTemplate(
+    userId: string,
+    retroDate: Date,
+    templateType: string,
+    db: Db = prisma
+): Promise<RetroLog | null> {
+    return db.retroLog.findFirst({
+        where: { userId, retroDate, templateType },
+    });
+}
+
+export async function countRetrosByUserAndDate(userId: string, retroDate: Date, db: Db = prisma): Promise<number> {
+    return db.retroLog.count({
         where: { userId, retroDate },
     });
 }

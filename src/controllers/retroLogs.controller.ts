@@ -76,6 +76,16 @@ export const searchRetros = async (req: Request, res: Response, next: NextFuncti
     }
 };
 
+export const listRetros = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const result = await retroLogsService.listRetros(res.locals.authUserId as string);
+        res.status(200).json(result);
+    } catch (err) {
+        if (sendServiceError(res, err)) return;
+        next(err);
+    }
+};
+
 export const updateRetro = async (req: Request, res: Response, next: NextFunction) => {
     try {
         const result = await retroLogsService.updateRetro(res.locals.authUserId as string, req.params.id as string, {

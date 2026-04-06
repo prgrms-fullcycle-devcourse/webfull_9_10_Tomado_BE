@@ -6,6 +6,7 @@ import { requireAuth } from './middleware/auth.middleware.js';
 const router = Router();
 router.use(requireAuth);
 
+router.get('/list', retroLogsController.listRetros);
 router.get('/search', retroLogsController.searchRetros);
 router.get('/', retroLogsController.getRetro);
 router.post('/', retroLogsController.createRetro);

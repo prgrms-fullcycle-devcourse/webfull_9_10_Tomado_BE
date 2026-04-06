@@ -177,6 +177,40 @@ export async function searchRetros(userId: string, q: string) {
     }));
 }
 
+export async function listRetros(userId: string) {
+    const rows = await retroRepo.findRetroListRowsByUser(userId);
+    const byDate = new Map<
+        string,
+        { retro_date: string; template_types: string[]; count: number; latest_created_at: string }
+    >();
+
+    for (const row of rows) {
+        const retroDate = retroRepo.toIsoDate(row.retroDate);
+        const createdAt = row.createdAt.toISOString();
+        const existing = byDate.get(retroDate);
+
+        if (!existing) {
+            byDate.set(retroDate, {
+                retro_date: retroDate,
+                template_types: [row.templateType],
+                count: 1,
+                latest_created_at: createdAt,
+            });
+            continue;
+        }
+
+        if (!existing.template_types.includes(row.templateType)) {
+            existing.template_types.push(row.templateType);
+        }
+        existing.count += 1;
+        if (existing.latest_created_at < createdAt) {
+            existing.latest_created_at = createdAt;
+        }
+    }
+
+    return Array.from(byDate.values());
+}
+
 export async function updateRetro(
     userId: string,
     id: string,

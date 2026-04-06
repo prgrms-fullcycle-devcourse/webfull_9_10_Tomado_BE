@@ -136,3 +136,21 @@ export async function findRetrosByIds(userId: string, ids: string[]): Promise<Re
         orderBy: { retroDate: 'desc' },
     });
 }
+
+export async function findRetroListRowsByUser(userId: string): Promise<
+    Array<{
+        retroDate: Date;
+        templateType: string;
+        createdAt: Date;
+    }>
+> {
+    return prisma.retroLog.findMany({
+        where: { userId },
+        select: {
+            retroDate: true,
+            templateType: true,
+            createdAt: true,
+        },
+        orderBy: [{ retroDate: 'desc' }, { createdAt: 'desc' }],
+    });
+}

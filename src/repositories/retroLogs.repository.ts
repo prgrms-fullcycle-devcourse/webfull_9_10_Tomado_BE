@@ -37,6 +37,13 @@ export async function findRetroByUserAndDailyLogId(userId: string, dailyLogId: s
     });
 }
 
+export async function findRetrosByUserAndDate(userId: string, retroDate: Date): Promise<RetroLog[]> {
+    return prisma.retroLog.findMany({
+        where: { userId, retroDate },
+        orderBy: [{ createdAt: 'asc' }, { templateType: 'asc' }],
+    });
+}
+
 export async function findRetroById(id: string): Promise<RetroLog | null> {
     return prisma.retroLog.findUnique({ where: { id } });
 }

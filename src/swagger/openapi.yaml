@@ -1701,9 +1701,9 @@ paths:
       tags: [RetroLogs]
       summary: 회고 조회
       description: |
-        `date`(YYYY-MM-DD)는 필수. `daily_log_id` 또는 `template_type` 중 하나는 반드시 지정한다.
-        같은 날 여러 템플릿 회고가 있을 때는 `daily_log_id`로 조회하거나, `date`+`template_type`으로 조회한다.
-        둘 다 주면 해당 일일 로그와 템플릿이 모두 일치하는 행만 반환한다.
+        `date`(YYYY-MM-DD) 기준으로 해당 날짜에 작성한 회고를 모두 조회한다.
+        `daily_log_id`는 선택 파라미터이며, 전달 시 사용자 소유·날짜 일치 검증에만 사용한다.
+        응답은 `template_type`별 회고를 포함한 배열이다.
       security:
         - BearerAuth: []
       parameters:
@@ -1722,32 +1722,53 @@ paths:
             type: string
             format: uuid
           example: f6a7b8c9-d0e1-2345-f012-456789012345
-          description: 연관 일일 로그 ID. `template_type` 없이 단독으로 사용 가능.
-        - name: template_type
-          in: query
-          required: false
-          schema:
-            type: string
-            enum: [Tech, Decision, Communication, Emotion]
-          example: Tech
-          description: |
-            `daily_log_id`가 없을 때 필수. 해당 날짜·템플릿 조합으로 회고를 찾는다.
-            `daily_log_id`와 함께 주면 응답 행의 템플릿이 이 값과 일치해야 한다.
+          description: 연관 일일 로그 ID (선택). 전달 시 date와 일치해야 한다.
       responses:
         '200':
           description: 회고 조회 성공
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/RetroLog'
+                type: array
+                items:
+                  $ref: '#/components/schemas/RetroLog'
+              example:
+                - id: b8c9d0e1-f2a3-4567-0123-678901234567
+                  user_id: a1b2c3d4-e5f6-7890-abcd-ef1234567890
+                  daily_log_id: f6a7b8c9-d0e1-2345-f012-456789012345
+                  retro_date: '2026-03-14'
+                  template_type: Tech
+                  content:
+                    learned_today: Prisma transaction을 이용한 원자적 저장 패턴을 익혔다.
+                    applied_technology: 회고 생성과 통계 업데이트를 한 트랜잭션으로 묶었다.
+                    technical_difficulty: JSON 필드 null 처리 타입 이슈가 있었다.
+                    next_to_try: content 검색 성능 개선을 위해 인덱스 전략을 검토한다.
+                  is_dirty: false
+                  draft_content: null
+                  created_at: '2026-03-14T10:00:00Z'
+                  updated_at: '2026-03-14T10:30:00Z'
+                - id: c9d0e1f2-a3b4-5678-0123-789012345678
+                  user_id: a1b2c3d4-e5f6-7890-abcd-ef1234567890
+                  daily_log_id: f6a7b8c9-d0e1-2345-f012-456789012345
+                  retro_date: '2026-03-14'
+                  template_type: Communication
+                  content:
+                    communication_highlights: 짧은 싱크로 API 계약을 빠르게 맞췄다.
+                    communication_friction: 초기 요구사항 전달이 일부 누락됐다.
+                    feedback_received: 오류 응답 메시지를 더 구체화해 달라는 피드백을 받았다.
+                    improvements: 문서와 구현 변경을 같은 배포 단위로 묶는다.
+                  is_dirty: false
+                  draft_content: null
+                  created_at: '2026-03-14T11:00:00Z'
+                  updated_at: '2026-03-14T11:20:00Z'
         '400':
-          description: 쿼리 검증 실패 (예: 식별자 누락, template_type 오류)
+          description: 쿼리 검증 실패 (예: date 형식 오류, daily_log_id 날짜 불일치)
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
         '404':
-          description: 해당 날짜 회고 없음
+          description: daily_log_id가 없거나 사용자 소유가 아님
           content:
             application/json:
               schema:
@@ -1755,7 +1776,7 @@ paths:
               example:
                 error:
                   code: NOT_FOUND
-                  message: 해당 날짜의 회고가 존재하지 않습니다.
+                  message: 해당 일일 로그가 존재하지 않습니다.
         '401':
           $ref: '#/components/responses/Unauthorized'
 

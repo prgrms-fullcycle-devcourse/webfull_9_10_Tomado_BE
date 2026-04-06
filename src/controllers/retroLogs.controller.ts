@@ -34,12 +34,10 @@ export const getRetro = async (req: Request, res: Response, next: NextFunction) 
     try {
         const date = typeof req.query.date === 'string' ? req.query.date : undefined;
         const daily_log_id = typeof req.query.daily_log_id === 'string' ? req.query.daily_log_id : undefined;
-        const template_type = typeof req.query.template_type === 'string' ? req.query.template_type : undefined;
 
         const result = await retroLogsService.getRetro(res.locals.authUserId as string, {
             date,
             daily_log_id,
-            template_type,
         });
         res.status(200).json(result);
     } catch (err) {

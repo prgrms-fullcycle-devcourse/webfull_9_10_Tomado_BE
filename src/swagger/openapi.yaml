@@ -1783,7 +1783,7 @@ paths:
                   created_at: '2026-03-14T11:00:00Z'
                   updated_at: '2026-03-14T11:20:00Z'
         '400':
-          description: 쿼리 검증 실패 (예: date 형식 오류, daily_log_id 날짜 불일치)
+          description: "쿼리 검증 실패 (예: date 형식 오류, daily_log_id 날짜 불일치)"
           content:
             application/json:
               schema:

@@ -181,12 +181,19 @@ export async function listRetros(userId: string) {
     const rows = await retroRepo.findRetroListRowsByUser(userId);
     const byDate = new Map<
         string,
-        { retro_date: string; template_types: string[]; count: number; latest_created_at: string }
+        {
+            retro_date: string;
+            template_types: string[];
+            count: number;
+            latest_created_at: string;
+            retros: Array<ReturnType<typeof serializeRetroLog>>;
+        }
     >();
 
     for (const row of rows) {
         const retroDate = retroRepo.toIsoDate(row.retroDate);
         const createdAt = row.createdAt.toISOString();
+        const serialized = serializeRetroLog(row);
         const existing = byDate.get(retroDate);
 
         if (!existing) {
@@ -195,6 +202,7 @@ export async function listRetros(userId: string) {
                 template_types: [row.templateType],
                 count: 1,
                 latest_created_at: createdAt,
+                retros: [serialized],
             });
             continue;
         }
@@ -203,6 +211,7 @@ export async function listRetros(userId: string) {
             existing.template_types.push(row.templateType);
         }
         existing.count += 1;
+        existing.retros.push(serialized);
         if (existing.latest_created_at < createdAt) {
             existing.latest_created_at = createdAt;
         }

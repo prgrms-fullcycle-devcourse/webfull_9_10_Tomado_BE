@@ -27,7 +27,7 @@ const loginBodySchema = z.object({
 });
 
 const refreshBodySchema = z.object({
-    refresh_token: z.string().min(1),
+    refresh_token: z.string().min(1).optional(),
 });
 
 function mapZodError(e: z.ZodError): AuthHttpError {
@@ -145,6 +145,14 @@ export async function refresh(rawBody: unknown) {
         throw mapZodError(parsed.error);
     }
     const { refresh_token } = parsed.data;
+    if (refresh_token == null) {
+        throw new AuthHttpError(
+            400,
+            'VALIDATION_ERROR',
+            'refresh_token 쿠키 또는 body 값이 필요합니다.',
+            'refresh_token'
+        );
+    }
     const { data, error } = await supabaseClient.auth.refreshSession({
         refresh_token,
     });

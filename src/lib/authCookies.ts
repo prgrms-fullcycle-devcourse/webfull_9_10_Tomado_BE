@@ -9,6 +9,17 @@ function isProduction() {
     return env.NODE_ENV === 'production';
 }
 
+function getAuthCookieOptions() {
+    const secure = isProduction();
+
+    return {
+        httpOnly: true,
+        sameSite: secure ? ('none' as const) : ('lax' as const),
+        secure,
+        path: '/',
+    };
+}
+
 function parseCookieHeader(cookieHeader: string | undefined) {
     if (cookieHeader == null || cookieHeader.trim() === '') {
         return {};
@@ -42,37 +53,17 @@ export function getCookie(req: Request, name: string) {
 }
 
 export function setAuthCookies(res: Response, tokens: { accessToken: string; refreshToken: string }) {
-    const secure = isProduction();
+    const cookieOptions = getAuthCookieOptions();
 
-    res.cookie(ACCESS_TOKEN_COOKIE_NAME, tokens.accessToken, {
-        httpOnly: true,
-        sameSite: 'lax',
-        secure,
-        path: '/',
-    });
+    res.cookie(ACCESS_TOKEN_COOKIE_NAME, tokens.accessToken, cookieOptions);
 
-    res.cookie(REFRESH_TOKEN_COOKIE_NAME, tokens.refreshToken, {
-        httpOnly: true,
-        sameSite: 'lax',
-        secure,
-        path: '/',
-    });
+    res.cookie(REFRESH_TOKEN_COOKIE_NAME, tokens.refreshToken, cookieOptions);
 }
 
 export function clearAuthCookies(res: Response) {
-    const secure = isProduction();
+    const cookieOptions = getAuthCookieOptions();
 
-    res.clearCookie(ACCESS_TOKEN_COOKIE_NAME, {
-        httpOnly: true,
-        sameSite: 'lax',
-        secure,
-        path: '/',
-    });
+    res.clearCookie(ACCESS_TOKEN_COOKIE_NAME, cookieOptions);
 
-    res.clearCookie(REFRESH_TOKEN_COOKIE_NAME, {
-        httpOnly: true,
-        sameSite: 'lax',
-        secure,
-        path: '/',
-    });
+    res.clearCookie(REFRESH_TOKEN_COOKIE_NAME, cookieOptions);
 }

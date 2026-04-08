@@ -1,0 +1,32 @@
+name: Notify Frontend OpenAPI Update
+
+on:
+  push:
+    branches:
+      - develop
+    paths:
+      - src/swagger/openapi.yaml
+
+jobs:
+  dispatch:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Trigger frontend regen workflow
+        env:
+          GH_TOKEN: ${{ secrets.FRONTEND_REPO_DISPATCH_TOKEN }}
+          FRONTEND_OWNER: ${{ vars.FRONTEND_OWNER }}
+          FRONTEND_REPO: ${{ vars.FRONTEND_REPO }}
+        run: |
+          curl -L \
+            -X POST \
+            -H "Accept: application/vnd.github+json" \
+            -H "Authorization: Bearer ${GH_TOKEN}" \
+            https://api.github.com/repos/${FRONTEND_OWNER}/${FRONTEND_REPO}/dispatches \
+            -d '{
+              "event_type": "openapi-updated",
+              "client_payload": {
+                "backend_sha": "${{ github.sha }}",
+                "backend_repo": "${{ github.repository }}"
+              }
+            }'

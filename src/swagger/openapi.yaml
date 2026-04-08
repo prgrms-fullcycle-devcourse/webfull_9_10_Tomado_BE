@@ -136,7 +136,7 @@ components:
 
     RefreshTokenRequest:
       type: object
-      required: [refresh_token]
+      description: 쿠키 기반 재발급을 기본으로 하며, 필요 시 refresh_token을 body로도 전달 가능
       properties:
         refresh_token:
           type: string
@@ -950,9 +950,11 @@ paths:
       operationId: refreshToken
       tags: [Auth]
       summary: 토큰 재발급
-      description: Refresh Token으로 Access Token 재발급 (Rotation). 기존 Refresh Token은 즉시 폐기됨.
+      description: |
+        Refresh Token으로 Access Token 재발급 (Rotation). 기존 Refresh Token은 즉시 폐기됨.
+        기본 동작은 쿠키(`refresh_token`) 기반이며, body의 `refresh_token`은 선택값이다.
       requestBody:
-        required: true
+        required: false
         content:
           application/json:
             schema:

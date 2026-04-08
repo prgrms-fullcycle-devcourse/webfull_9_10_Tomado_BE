@@ -8,7 +8,7 @@ info:
     보호된 엔드포인트는 `Authorization: Bearer {access_token}` 헤더 또는 `access_token` 쿠키가 필요합니다.
     Access Token 만료 시 `/auth/refresh`로 재발급하세요.
 
-    ## 삭제
+    ## 삭제 정책
     완료된 투두(`completed_at IS NOT NULL`)는 삭제 불가 — 기록 보존 원칙.
   version: 1.0.0
   contact:

@@ -18,7 +18,9 @@ jobs:
           FRONTEND_OWNER: ${{ vars.FRONTEND_OWNER }}
           FRONTEND_REPO: ${{ vars.FRONTEND_REPO }}
         run: |
-          curl -L \
+          HTTP_STATUS=$(curl -L \
+            -o /tmp/dispatch-response.json \
+            -w "%{http_code}" \
             -X POST \
             -H "Accept: application/vnd.github+json" \
             -H "Authorization: Bearer ${GH_TOKEN}" \
@@ -29,4 +31,9 @@ jobs:
                 "backend_sha": "${{ github.sha }}",
                 "backend_repo": "${{ github.repository }}"
               }
-            }'
+            }')
+      
+          echo "HTTP_STATUS=${HTTP_STATUS}"
+          cat /tmp/dispatch-response.json
+      
+          test "${HTTP_STATUS}" = "204"

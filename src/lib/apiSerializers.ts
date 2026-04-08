@@ -8,12 +8,12 @@ function toIsoDateTime(value: Date): string {
     return value.toISOString();
 }
 
-export function serializeUser(user: User) {
+export function serializeUser(user: User, avatarUrlOverride?: string | null) {
     return {
         id: user.id,
         login_id: user.loginId,
         nickname: user.nickname,
-        avatar_url: user.avatarUrl,
+        avatar_url: avatarUrlOverride ?? user.avatarUrl,
         created_at: toIsoDateTime(user.createdAt),
         updated_at: toIsoDateTime(user.updatedAt),
     };

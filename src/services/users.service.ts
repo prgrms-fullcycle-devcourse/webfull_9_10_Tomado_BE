@@ -1,4 +1,5 @@
 import { serializeUser, serializeUserSetting } from '../lib/apiSerializers.js';
+import * as avatarService from './avatar.service.js';
 import * as usersRepository from '../repositories/users.repository.js';
 
 // 내 프로필 조회
@@ -9,7 +10,9 @@ export async function getMyProfile(userId: string) {
         throw new Error('NOT_FOUND');
     }
 
-    return serializeUser(user);
+    const avatarUrl = await avatarService.getAvatarUrl(userId);
+
+    return serializeUser(user, avatarUrl);
 }
 
 // 내 프로필 수정
@@ -25,7 +28,33 @@ export async function updateMyProfile(userId: string, data: { nickname?: string;
         nickname: data.nickname,
         avatarUrl: data.avatar_url,
     });
-    return serializeUser(updated);
+    const avatarUrl = await avatarService.getAvatarUrl(userId);
+
+    return serializeUser(updated, avatarUrl);
+}
+
+export async function uploadMyAvatar(userId: string, file: Express.Multer.File) {
+    const user = await usersRepository.findUserById(userId);
+
+    if (!user) {
+        throw new Error('NOT_FOUND');
+    }
+
+    const avatarUrl = await avatarService.replaceAvatar(userId, file);
+
+    return serializeUser(user, avatarUrl);
+}
+
+export async function deleteMyAvatar(userId: string) {
+    const user = await usersRepository.findUserById(userId);
+
+    if (!user) {
+        throw new Error('NOT_FOUND');
+    }
+
+    await avatarService.deleteAvatar(userId);
+
+    return serializeUser(user, null);
 }
 
 // 내 앱 설정 조회

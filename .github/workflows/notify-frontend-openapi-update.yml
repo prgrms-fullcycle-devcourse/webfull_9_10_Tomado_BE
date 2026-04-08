@@ -1,4 +1,4 @@
-name: Notify Frontend OpenAPI Update
+  name: Notify Frontend OpenAPI Update
 
 on:
   push:

@@ -46,6 +46,14 @@ components:
       type: http
       scheme: bearer
       bearerFormat: JWT
+    AccessTokenCookie:
+      type: apiKey
+      in: cookie
+      name: access_token
+    RefreshTokenCookie:
+      type: apiKey
+      in: cookie
+      name: refresh_token
 
   # ── 공통 응답 ──────────────────────────
   responses:
@@ -861,6 +869,11 @@ paths:
       responses:
         '201':
           description: 회원가입 성공
+          headers:
+            Set-Cookie:
+              description: HttpOnly 쿠키 `access_token`, `refresh_token`이 함께 설정됩니다.
+              schema:
+                type: string
           content:
             application/json:
               schema:
@@ -916,6 +929,11 @@ paths:
       responses:
         '200':
           description: 로그인 성공
+          headers:
+            Set-Cookie:
+              description: HttpOnly 쿠키 `access_token`, `refresh_token`이 함께 설정됩니다.
+              schema:
+                type: string
           content:
             application/json:
               schema:
@@ -953,6 +971,8 @@ paths:
       description: |
         Refresh Token으로 Access Token 재발급 (Rotation). 기존 Refresh Token은 즉시 폐기됨.
         기본 동작은 쿠키(`refresh_token`) 기반이며, body의 `refresh_token`은 선택값이다.
+      security:
+        - RefreshTokenCookie: []
       requestBody:
         required: false
         content:
@@ -962,6 +982,11 @@ paths:
       responses:
         '200':
           description: 새 토큰 발급 성공
+          headers:
+            Set-Cookie:
+              description: HttpOnly 쿠키 `access_token`, `refresh_token`이 함께 설정됩니다.
+              schema:
+                type: string
           content:
             application/json:
               schema:
@@ -988,6 +1013,7 @@ paths:
       description: Supabase에서 현재 세션의 Refresh Token을 폐기.
       security:
         - BearerAuth: []
+        - AccessTokenCookie: []
       responses:
         '204':
           description: 로그아웃 성공 (본문 없음)
@@ -1005,6 +1031,7 @@ paths:
       description: 현재 로그인한 사용자의 프로필 정보 조회.
       security:
         - BearerAuth: []
+        - AccessTokenCookie: []
       responses:
         '200':
           description: 프로필 조회 성공
@@ -1019,9 +1046,10 @@ paths:
       operationId: updateMyProfile
       tags: [Users]
       summary: 프로필 수정
-      description: 닉네임 또는 아바타 URL 수정. 변경할 필드만 전송 가능.
+      description: 닉네임 수정. 변경할 필드만 전송 가능.
       security:
         - BearerAuth: []
+        - AccessTokenCookie: []
       requestBody:
         required: true
         content:
@@ -1051,6 +1079,76 @@ paths:
         '401':
           $ref: '#/components/responses/Unauthorized'
 
+  /api/v1/users/me/avatar:
+    post:
+      operationId: uploadMyAvatar
+      tags: [Users]
+      summary: 프로필 이미지 업로드/교체
+      description: |
+        현재 로그인한 사용자의 프로필 이미지를 업로드하거나 교체합니다.
+        이미 등록된 이미지가 있으면 삭제 후 새 파일 1개만 유지합니다.
+      security:
+        - BearerAuth: []
+        - AccessTokenCookie: []
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required: [avatar]
+              properties:
+                avatar:
+                  type: string
+                  format: binary
+                  description: 업로드할 프로필 이미지 파일
+      responses:
+        '200':
+          description: 업로드 성공
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '400':
+          description: 파일 누락 또는 유효성 검사 실패
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              examples:
+                missingFile:
+                  summary: 파일 없음
+                  value:
+                    error:
+                      code: VALIDATION_ERROR
+                      message: avatar 파일이 필요합니다.
+                invalidFile:
+                  summary: 이미지 아님
+                  value:
+                    error:
+                      code: VALIDATION_ERROR
+                      message: 이미지 파일만 업로드할 수 있습니다.
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+    delete:
+      operationId: deleteMyAvatar
+      tags: [Users]
+      summary: 프로필 이미지 삭제
+      description: 현재 로그인한 사용자의 프로필 이미지를 삭제하고 기본 아바타 상태로 되돌립니다.
+      security:
+        - BearerAuth: []
+        - AccessTokenCookie: []
+      responses:
+        '200':
+          description: 삭제 성공
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
   /api/v1/users/me/settings:
     get:
       operationId: getMySettings
@@ -1059,6 +1157,7 @@ paths:
       description: 사용자 앱 설정 (포모도로 시간, 자동이월 등) 조회.
       security:
         - BearerAuth: []
+        - AccessTokenCookie: []
       responses:
         '200':
           description: 설정 조회 성공
@@ -1076,6 +1175,7 @@ paths:
       description: 앱 설정 변경. 변경할 필드만 전송 가능.
       security:
         - BearerAuth: []
+        - AccessTokenCookie: []
       requestBody:
         required: true
         content:
@@ -1120,6 +1220,7 @@ paths:
         과거 날짜 조회 시 완료 투두(`completed_at IS NOT NULL`)가 자연스럽게 포함됨.
       security:
         - BearerAuth: []
+        - AccessTokenCookie: []
       parameters:
         - name: date
           in: query
@@ -1148,6 +1249,7 @@ paths:
       description: 새 투두 생성. `sort_order`는 기존 마지막 값 + 1.0으로 자동 계산.
       security:
         - BearerAuth: []
+        - AccessTokenCookie: []
       requestBody:
         required: true
         content:
@@ -1183,6 +1285,7 @@ paths:
       description: 투두 내용 수정. 변경할 필드만 전송.
       security:
         - BearerAuth: []
+        - AccessTokenCookie: []
       parameters:
         - name: id
           in: path
@@ -1218,6 +1321,7 @@ paths:
         완료된 투두는 "그날 한 일"의 기록이므로 삭제 불가 — `400` 반환.
       security:
         - BearerAuth: []
+        - AccessTokenCookie: []
       parameters:
         - name: id
           in: path
@@ -1254,6 +1358,7 @@ paths:
         - `completed: false` → `completed_at = null`, `daily_focus_stats.completed_todos -1`
       security:
         - BearerAuth: []
+        - AccessTokenCookie: []
       parameters:
         - name: id
           in: path
@@ -1306,6 +1411,7 @@ paths:
         A(1.0)~B(2.0) 사이 삽입 시 midpoint(1.5) 사용. 범위 부족 시 전체 재정렬 실행.
       security:
         - BearerAuth: []
+        - AccessTokenCookie: []
       parameters:
         - name: id
           in: path
@@ -1356,6 +1462,7 @@ paths:
       description: 포모도로 세션 시작 기록 생성.
       security:
         - BearerAuth: []
+        - AccessTokenCookie: []
       requestBody:
         required: true
         content:
@@ -1400,6 +1507,7 @@ paths:
       description: 기간별 포모도로 세션 이력 조회.
       security:
         - BearerAuth: []
+        - AccessTokenCookie: []
       parameters:
         - name: start_date
           in: query
@@ -1450,6 +1558,7 @@ paths:
         `focus` 타입만 `total_focus_sec`, `completed_sessions` 집계.
       security:
         - BearerAuth: []
+        - AccessTokenCookie: []
       parameters:
         - name: id
           in: path
@@ -1499,6 +1608,7 @@ paths:
       description: 특정 날짜의 데일리 로그 조회. 해당 날짜 로그가 없으면 404 반환.
       security:
         - BearerAuth: []
+        - AccessTokenCookie: []
       parameters:
         - name: date
           in: query
@@ -1534,6 +1644,7 @@ paths:
       description: 데일리 로그 생성. 성공 시 `daily_focus_stats.has_daily_log = true` UPSERT.
       security:
         - BearerAuth: []
+        - AccessTokenCookie: []
       requestBody:
         required: true
         content:
@@ -1568,6 +1679,7 @@ paths:
       description: 기간 내 데일리 로그 목록 조회 (달력 배지, 이력 페이지용). `content` 필드 제외하여 경량화.
       security:
         - BearerAuth: []
+        - AccessTokenCookie: []
       parameters:
         - name: start_date
           in: query
@@ -1614,6 +1726,7 @@ paths:
       description: title + content 기반 검색
       security:
         - BearerAuth: []
+        - AccessTokenCookie: []
       parameters:
         - name: q
           in: query
@@ -1653,6 +1766,7 @@ paths:
         데일리 로그 수정. debounce autoSave 시 `is_dirty=false`, 실패 시 `draft_content`에 임시본 저장.
       security:
         - BearerAuth: []
+        - AccessTokenCookie: []
       parameters:
         - name: id
           in: path
@@ -1697,6 +1811,7 @@ paths:
       description: 데일리 로그 삭제. `daily_focus_stats.has_daily_log = false` UPSERT.
       security:
         - BearerAuth: []
+        - AccessTokenCookie: []
       parameters:
         - name: id
           in: path
@@ -1734,6 +1849,7 @@ paths:
         응답은 `template_type`별 회고를 포함한 배열이다.
       security:
         - BearerAuth: []
+        - AccessTokenCookie: []
       parameters:
         - name: date
           in: query
@@ -1815,6 +1931,7 @@ paths:
       description: 회고 생성. `daily_log_id` 없이도 생성 가능. 성공 시 `daily_focus_stats.has_retro_log = true` UPSERT.
       security:
         - BearerAuth: []
+        - AccessTokenCookie: []
       requestBody:
         required: true
         content:
@@ -1902,6 +2019,7 @@ paths:
       description: content 기반 검색
       security:
         - BearerAuth: []
+        - AccessTokenCookie: []
       parameters:
         - name: q
           in: query
@@ -1942,6 +2060,7 @@ paths:
         좌측 사이드바 목록 렌더링용 API.
       security:
         - BearerAuth: []
+        - AccessTokenCookie: []
       responses:
         '200':
           description: 회고 목록 조회 성공
@@ -2015,6 +2134,7 @@ paths:
       description: 회고 내용 수정. `is_dirty` / `draft_content` 자동저장 패턴은 데일리로그와 동일.
       security:
         - BearerAuth: []
+        - AccessTokenCookie: []
       parameters:
         - name: id
           in: path
@@ -2088,6 +2208,7 @@ paths:
       description: 회고 삭제. `daily_focus_stats.has_retro_log = false` UPSERT.
       security:
         - BearerAuth: []
+        - AccessTokenCookie: []
       parameters:
         - name: id
           in: path
@@ -2114,6 +2235,7 @@ paths:
       description: 회원가입부터 현재까지의 누적 통계 및 연속 스트릭 조회.
       security:
         - BearerAuth: []
+        - AccessTokenCookie: []
       responses:
         '200':
           description: 누적 기록 조회 성공
@@ -2132,6 +2254,7 @@ paths:
       description: 최근 1년간의 잔디 데이터 조회. 날짜 파라미터 불필요.
       security:
         - BearerAuth: []
+        - AccessTokenCookie: []
       responses:
         '200':
           description: 히트맵 데이터 조회 성공
@@ -2152,6 +2275,7 @@ paths:
       description: 최근 1년간의 포모도로, 집중시간, 일평균 포모도로 조회.
       security:
         - BearerAuth: []
+        - AccessTokenCookie: []
       responses:
         '200':
           description: 히트맵 상단 통계 조회 성공
@@ -2170,6 +2294,7 @@ paths:
       description: 월간 달력 배지 (데일리로그/회고 작성 여부, 포모도로 수) 조회.
       security:
         - BearerAuth: []
+        - AccessTokenCookie: []
       parameters:
         - name: year
           in: query

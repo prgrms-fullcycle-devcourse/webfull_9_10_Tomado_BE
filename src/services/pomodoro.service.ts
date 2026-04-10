@@ -2,7 +2,7 @@ import { serializePomodoroSession } from '../lib/apiSerializers.js';
 import * as pomodoroRepository from '../repositories/pomodoro.repository.js';
 
 const VALID_TYPES = ['focus', 'short_break', 'long_break'];
-const VALID_STATUSES = ['completed', 'cancelled'];
+const VALID_STATUSES = ['completed', 'cancelled', 'skipped'];
 
 const createError = (code: string, message: string, field?: string) => {
     const err = new Error(message) as any;
@@ -31,7 +31,7 @@ export const endSession = async (
     body: { status: string; actual_sec: number; ended_at: string }
 ) => {
     if (!VALID_STATUSES.includes(body.status)) {
-        throw createError('VALIDATION_ERROR', 'status는 completed 또는 cancelled여야 합니다.', 'status');
+        throw createError('VALIDATION_ERROR', 'status는 completed, cancelled, skipped 중 하나여야 합니다.', 'status');
     }
 
     const session = await pomodoroRepository.findSessionById(sessionId);

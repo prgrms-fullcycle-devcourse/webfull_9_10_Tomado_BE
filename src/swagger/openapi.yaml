@@ -257,7 +257,7 @@ components:
       properties:
         status:
           type: string
-          enum: [completed, cancelled]
+          enum: [completed, cancelled, skipped]
           example: completed
         actual_sec:
           type: integer

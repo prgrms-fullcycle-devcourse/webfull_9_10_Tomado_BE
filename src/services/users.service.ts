@@ -1,4 +1,5 @@
 import { serializeUser, serializeUserSetting } from '../lib/apiSerializers.js';
+import { supabaseAdmin } from '../lib/supabase.js';
 import * as avatarService from './avatar.service.js';
 import * as usersRepository from '../repositories/users.repository.js';
 
@@ -102,6 +103,13 @@ export async function deleteMyAccount(userId: string) {
 
     if (!user) {
         throw new Error('NOT_FOUND');
+    }
+
+    await avatarService.deleteAvatar(userId);
+
+    const { error } = await supabaseAdmin.auth.admin.deleteUser(userId);
+    if (error) {
+        throw new Error('INTERNAL_ERROR');
     }
 
     await usersRepository.deleteUser(userId);

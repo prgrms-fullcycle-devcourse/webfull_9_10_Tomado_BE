@@ -37,6 +37,9 @@ export const endSession = async (
     const session = await pomodoroRepository.findSessionById(sessionId);
     if (!session) throw createError('NOT_FOUND', '해당 세션을 찾을 수 없습니다.');
     if (session.userId !== userId) throw createError('FORBIDDEN', '본인의 세션만 종료할 수 있습니다');
+    if (session.status !== null || session.endedAt !== null) {
+        throw createError('VALIDATION_ERROR', '이미 종료된 세션입니다.');
+    }
 
     const ended = await pomodoroRepository.endSession(sessionId, {
         status: body.status,

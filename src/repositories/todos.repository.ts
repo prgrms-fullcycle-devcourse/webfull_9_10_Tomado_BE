@@ -25,6 +25,17 @@ export const findTodosByDate = async (userId: string, assignedDate: string): Pro
     });
 };
 
+export const findIncompleteTodosByDate = async (userId: string, assignedDate: string): Promise<Todo[]> => {
+    return prisma.todo.findMany({
+        where: {
+            userId,
+            assignedDate: new Date(assignedDate),
+            completedAt: null,
+        },
+        orderBy: { sortOrder: 'asc' },
+    });
+};
+
 // todo 생성
 export const createTodo = async (data: {
     userId: string;
@@ -65,6 +76,39 @@ export const updateTodo = async (
             ...(data.description !== undefined && { description: data.description }),
             ...(data.assignedDate !== undefined && { assignedDate: new Date(data.assignedDate) }),
         },
+    });
+};
+
+export const carryOverIncompleteTodos = async (userId: string, fromDate: string, toDate: string): Promise<void> => {
+    await prisma.$transaction(async (tx) => {
+        const existingToday = await tx.todo.aggregate({
+            where: {
+                userId,
+                assignedDate: new Date(toDate),
+            },
+            _max: { sortOrder: true },
+        });
+
+        const todosToCarry = await tx.todo.findMany({
+            where: {
+                userId,
+                assignedDate: new Date(fromDate),
+                completedAt: null,
+            },
+            orderBy: { sortOrder: 'asc' },
+        });
+
+        let nextOrder = (existingToday._max.sortOrder ?? 0) + 1.0;
+        for (const todo of todosToCarry) {
+            await tx.todo.update({
+                where: { id: todo.id },
+                data: {
+                    assignedDate: new Date(toDate),
+                    sortOrder: nextOrder,
+                },
+            });
+            nextOrder += 1.0;
+        }
     });
 };
 

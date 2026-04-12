@@ -1,7 +1,8 @@
 import type { DailyFocusStat, DailyLog, PomodoroSession, Todo, User, UserSetting } from '@prisma/client';
+import { toIsoDateInSeoul } from './date.js';
 
 function toIsoDate(value: Date): string {
-    return value.toISOString().split('T')[0]!;
+    return toIsoDateInSeoul(value);
 }
 
 function toIsoDateTime(value: Date): string {

@@ -1,4 +1,5 @@
 import { serializePomodoroSession } from '../lib/apiSerializers.js';
+import { toIsoDateInSeoul } from '../lib/date.js';
 import * as pomodoroRepository from '../repositories/pomodoro.repository.js';
 
 const VALID_TYPES = ['focus', 'short_break', 'long_break'];
@@ -9,6 +10,21 @@ const createError = (code: string, message: string, field?: string) => {
     err.code = code;
     err.field = field;
     return err;
+};
+
+const parseEndedAt = (value: string): Date => {
+    const normalized = value.trim().replace(/\s*T\s*/i, 'T');
+    const endedAt = new Date(normalized);
+
+    if (Number.isNaN(endedAt.getTime())) {
+        throw createError(
+            'VALIDATION_ERROR',
+            'ended_at은 올바른 ISO 8601 날짜/시간이어야 합니다. 예: 2026-04-11T09:25:00Z',
+            'ended_at'
+        );
+    }
+
+    return endedAt;
 };
 
 // 세션 시작
@@ -33,6 +49,11 @@ export const endSession = async (
     if (!VALID_STATUSES.includes(body.status)) {
         throw createError('VALIDATION_ERROR', 'status는 completed, cancelled, skipped 중 하나여야 합니다.', 'status');
     }
+    if (!Number.isInteger(body.actual_sec) || body.actual_sec < 0) {
+        throw createError('VALIDATION_ERROR', 'actual_sec은 0 이상의 정수여야 합니다.', 'actual_sec');
+    }
+
+    const endedAt = parseEndedAt(body.ended_at);
 
     const session = await pomodoroRepository.findSessionById(sessionId);
     if (!session) throw createError('NOT_FOUND', '해당 세션을 찾을 수 없습니다.');
@@ -44,15 +65,11 @@ export const endSession = async (
     const ended = await pomodoroRepository.endSession(sessionId, {
         status: body.status,
         actualSec: body.actual_sec,
-        endedAt: body.ended_at,
+        endedAt,
     });
 
     if (session.type === 'focus' && body.status === 'completed') {
-        await pomodoroRepository.upsertDaliyFocusStat(
-            userId,
-            session.focusDate!.toISOString().split('T')[0]!,
-            body.actual_sec
-        );
+        await pomodoroRepository.upsertDaliyFocusStat(userId, toIsoDateInSeoul(session.focusDate!), body.actual_sec);
     }
 
     return serializePomodoroSession(ended);

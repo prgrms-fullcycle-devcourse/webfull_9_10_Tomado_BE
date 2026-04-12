@@ -1,4 +1,5 @@
 import { serializeDailyFocusStat } from '../lib/apiSerializers.js';
+import { toIsoDateInSeoul } from '../lib/date.js';
 import * as statsRepository from '../repositories/stats.repository.js';
 
 // 스트릭 계산 함수
@@ -8,13 +9,19 @@ const calculateStreak = (focusDates: Date[]): number => {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
 
-    const dateSet = new Set(focusDates.map((d) => d.toISOString().split('T')[0]));
+    const dateSet = new Set(focusDates.map((d) => toIsoDateInSeoul(d)));
 
     let streak = 0;
     const current = new Date(today);
+    const todayStr = toIsoDateInSeoul(today);
+
+    // 오늘 기록이 없으면 어제부터 연속 기록을 계산해 UX상 자연스럽게 유지한다.
+    if (!dateSet.has(todayStr)) {
+        current.setDate(current.getDate() - 1);
+    }
 
     while (true) {
-        const dateStr = current.toISOString().split('T')[0];
+        const dateStr = toIsoDateInSeoul(current);
         if (dateSet.has(dateStr)) {
             streak++;
             current.setDate(current.getDate() - 1);

@@ -22,14 +22,14 @@ export const findSessionById = async (id: string): Promise<PomodoroSession | nul
 // 세션 종료
 export const endSession = async (
     id: string,
-    data: { status: string; actualSec: number; endedAt: string }
+    data: { status: string; actualSec: number; endedAt: Date }
 ): Promise<PomodoroSession> => {
     return await prisma.pomodoroSession.update({
         where: { id },
         data: {
             status: data.status,
             actualSec: data.actualSec,
-            endedAt: new Date(data.endedAt),
+            endedAt: data.endedAt,
         },
     });
 };

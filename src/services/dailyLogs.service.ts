@@ -1,4 +1,5 @@
 import { serializeDailyLog } from '../lib/apiSerializers.js';
+import { toIsoDateInSeoul } from '../lib/date.js';
 import * as dailyLogsRepository from '../repositories/dailyLogs.repository.js';
 
 const createError = (status: number, code: string, message: string) => {
@@ -11,7 +12,7 @@ const createError = (status: number, code: string, message: string) => {
 // 로그 요약 데이터 가공 (목록용)
 const mapToSummary = (log: any) => ({
     id: log.id,
-    log_date: log.logDate.toISOString().split('T')[0],
+    log_date: toIsoDateInSeoul(log.logDate),
     title: log.title,
     tags: log.tags,
     has_retro_log: log.retroLogs ? log.retroLogs.length > 0 : false,
@@ -73,7 +74,7 @@ export const searchLogs = async (userId: string, query: string) => {
 
         return {
             id: log.id,
-            log_date: log.logDate.toISOString().split('T')[0],
+            log_date: toIsoDateInSeoul(log.logDate),
             title: log.title,
             content_preview: preview,
             tags: log.tags,

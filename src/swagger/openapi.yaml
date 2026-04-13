@@ -672,10 +672,17 @@ components:
           type: string
           format: date
           example: '2026-06-10'
+        updated_at:
+          type: string
+          format: date-time
+          example: '2026-06-10T18:00:00Z'
         title:
           type: string
           nullable: true
           example: "오늘의 개발 일지"
+        content:
+          type: string
+          example: "## 오늘 한 일\n- API 명세서 작성 완료\n- ERD 리뷰"
         tags:
           type: array
           items:

@@ -14,8 +14,10 @@ const mapToSummary = (log: any) => ({
     id: log.id,
     log_date: toIsoDateInSeoul(log.logDate),
     title: log.title,
+    content: log.content,
     tags: log.tags,
     has_retro_log: log.retroLogs ? log.retroLogs.length > 0 : false,
+    updated_at: log.updatedAt.toISOString(),
 });
 
 // 데일리 로그 생성

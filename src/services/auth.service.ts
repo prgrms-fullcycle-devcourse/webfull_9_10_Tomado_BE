@@ -30,6 +30,13 @@ const refreshBodySchema = z.object({
     refresh_token: z.string().min(1).optional(),
 });
 
+const loginIdCheckQuerySchema = z.object({
+    login_id: z
+        .string()
+        .regex(/^[a-zA-Z0-9]{4,20}$/, 'login_id는 4~20자 영문+숫자여야 합니다.')
+        .describe('login_id'),
+});
+
 function mapZodError(e: z.ZodError): AuthHttpError {
     const first = e.errors[0];
     if (!first) {
@@ -107,6 +114,24 @@ export async function register(rawBody: unknown) {
         }
         throw e;
     }
+}
+
+export async function checkLoginId(rawQuery: unknown) {
+    const parsed = loginIdCheckQuerySchema.safeParse(rawQuery);
+    if (!parsed.success) {
+        throw mapZodError(parsed.error);
+    }
+
+    const { login_id } = parsed.data;
+    const existing = await authRepo.findUserByLoginId(login_id);
+
+    return {
+        status: 200 as const,
+        body: {
+            login_id,
+            available: existing == null,
+        },
+    };
 }
 
 export async function login(rawBody: unknown) {

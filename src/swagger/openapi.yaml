@@ -142,6 +142,17 @@ components:
           example: 존개발
           description: 서비스 내 닉네임 (2~20자)
 
+    LoginIdCheckResponse:
+      type: object
+      required: [login_id, available]
+      properties:
+        login_id:
+          type: string
+          example: devjohn
+        available:
+          type: boolean
+          example: true
+
     RefreshTokenRequest:
       type: object
       description: 쿠키 기반 재발급을 기본으로 하며, 필요 시 refresh_token을 body로도 전달 가능
@@ -892,6 +903,52 @@ paths:
   # ══════════════════════════════════════
   # 1. AUTH
   # ══════════════════════════════════════
+  /api/v1/auth/login-id/check:
+    get:
+      operationId: checkLoginId
+      tags: [Auth]
+      summary: 로그인 아이디 중복 확인
+      description: 회원가입 전에 `login_id` 사용 가능 여부를 확인합니다.
+      parameters:
+        - in: query
+          name: login_id
+          required: true
+          schema:
+            type: string
+            minLength: 4
+            maxLength: 20
+            pattern: '^[a-zA-Z0-9]{4,20}$'
+          description: 확인할 로그인 ID (영문+숫자, 4~20자)
+      responses:
+        '200':
+          description: 확인 성공
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoginIdCheckResponse'
+              examples:
+                available:
+                  summary: 사용 가능
+                  value:
+                    login_id: devjohn
+                    available: true
+                unavailable:
+                  summary: 이미 사용 중
+                  value:
+                    login_id: devjohn
+                    available: false
+        '400':
+          description: 유효성 검사 실패
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              example:
+                error:
+                  code: VALIDATION_ERROR
+                  message: login_id는 4~20자 영문+숫자여야 합니다.
+                  field: login_id
+
   /api/v1/auth/register:
     post:
       operationId: register

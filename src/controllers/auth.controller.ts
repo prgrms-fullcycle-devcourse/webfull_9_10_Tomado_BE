@@ -54,6 +54,22 @@ export async function login(req: Request, res: Response) {
     }
 }
 
+export async function checkLoginId(req: Request, res: Response) {
+    try {
+        const result = await authService.checkLoginId(req.query);
+        res.status(result.status).json(result.body);
+    } catch (e) {
+        if (e instanceof AuthHttpError) {
+            sendAuthError(res, e);
+            return;
+        }
+        console.error(e);
+        res.status(500).json({
+            error: { code: 'INTERNAL_ERROR', message: '서버 오류가 발생했습니다.' },
+        });
+    }
+}
+
 export async function refresh(req: Request, res: Response) {
     try {
         const refreshTokenFromCookie = getCookie(req, REFRESH_TOKEN_COOKIE_NAME);

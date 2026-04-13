@@ -1,23 +1,7 @@
 import { serializeTodo } from '../lib/apiSerializers.js';
-import { toIsoDateInSeoul } from '../lib/date.js';
 import * as todosRepository from '../repositories/todos.repository.js';
-import * as usersRepository from '../repositories/users.repository.js';
-
-function getPreviousIsoDate(isoDate: string) {
-    const date = new Date(`${isoDate}T00:00:00.000Z`);
-    date.setUTCDate(date.getUTCDate() - 1);
-    return date.toISOString().split('T')[0]!;
-}
 
 export const getTodos = async (userId: string, assignedDate: string) => {
-    const userSettings = await usersRepository.findSettingByUserId(userId);
-    const todayInSeoul = toIsoDateInSeoul(new Date());
-
-    if (userSettings?.autoCarryTodo === true && assignedDate === todayInSeoul) {
-        const previousDate = getPreviousIsoDate(assignedDate);
-        await todosRepository.carryOverIncompleteTodos(userId, previousDate, assignedDate);
-    }
-
     const todos = await todosRepository.findTodosByDate(userId, assignedDate);
     return todos.map(serializeTodo);
 };

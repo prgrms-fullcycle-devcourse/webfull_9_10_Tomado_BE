@@ -55,6 +55,30 @@ export const getLogsInRange = async (userId: string, startDate: string, endDate:
     return logs.map(mapToSummary);
 };
 
+// 전체 목록 페이징 조회 (최신순)
+export const getLogsPaginated = async (userId: string, page: number, limit: number) => {
+    const isAll = limit === 0;
+    const skip = isAll ? undefined : (page - 1) * limit;
+    const take = isAll ? undefined : limit;
+
+    const [totalCount, logs] = await Promise.all([
+        dailyLogsRepository.countDailyLogs(userId),
+        dailyLogsRepository.findDailyLogsPaginated(userId, skip, take),
+    ]);
+
+    const totalPages = isAll ? 1 : Math.ceil(totalCount / limit);
+
+    return {
+        data: logs.map(mapToSummary),
+        meta: {
+            total_count: totalCount,
+            total_pages: totalPages,
+            current_page: page,
+            limit: limit,
+        },
+    };
+};
+
 // 검색 및 미리보기 가공
 export const searchLogs = async (userId: string, query: string) => {
     const logs = await dailyLogsRepository.searchDailyLogs(userId, query);

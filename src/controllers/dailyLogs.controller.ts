@@ -50,7 +50,7 @@ export const getLogByDate = async (req: Request, res: Response) => {
     }
 };
 
-// 목록 조회
+// 기간별 목록 조회
 export const getLogsInRange = async (req: Request, res: Response) => {
     try {
         const userId = res.locals.authUserId;
@@ -64,6 +64,21 @@ export const getLogsInRange = async (req: Request, res: Response) => {
 
         const logs = await dailyLogsService.getLogsInRange(userId, start_date as string, end_date as string);
         return res.status(200).json(logs);
+    } catch (e: any) {
+        return handleError(res, e);
+    }
+};
+
+// 전체 목록 조회 (페이징)
+export const getAllLogs = async (req: Request, res: Response) => {
+    try {
+        const userId = res.locals.authUserId;
+        const page = parseInt(req.query.page as string) || 1;
+        const limitStr = req.query.limit as string;
+        const limit = limitStr === '0' ? 0 : parseInt(limitStr) || 10;
+
+        const result = await dailyLogsService.getLogsPaginated(userId, page, limit);
+        return res.status(200).json(result);
     } catch (e: any) {
         return handleError(res, e);
     }

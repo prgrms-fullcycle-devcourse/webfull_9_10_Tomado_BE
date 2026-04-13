@@ -86,6 +86,32 @@ export const findDailyLogsInRange = async (
     })) as (DailyLog & { retroLogs: { id: string }[] })[];
 };
 
+// 전체 데일리 로그 페이징 조회 (최신순)
+export const findDailyLogsPaginated = async (
+    userId: string,
+    skip?: number,
+    take?: number
+): Promise<(DailyLog & { retroLogs: { id: string }[] })[]> => {
+    return (await prisma.dailyLog.findMany({
+        where: { userId },
+        include: {
+            retroLogs: {
+                select: { id: true },
+            },
+        },
+        orderBy: { logDate: 'desc' },
+        skip,
+        take,
+    })) as (DailyLog & { retroLogs: { id: string }[] })[];
+};
+
+// 사용자의 전체 데일리 로그 개수 조회
+export const countDailyLogs = async (userId: string): Promise<number> => {
+    return await prisma.dailyLog.count({
+        where: { userId },
+    });
+};
+
 // 검색 (제목/본문 기반)
 export const searchDailyLogs = async (
     userId: string,

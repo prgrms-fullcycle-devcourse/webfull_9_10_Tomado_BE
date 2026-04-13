@@ -10,6 +10,7 @@ router.use(requireAuth);
 router.get('/', dailyLogsController.getLogByDate);
 router.post('/', dailyLogsController.createLog);
 router.get('/list', dailyLogsController.getLogsInRange);
+router.get('/all', dailyLogsController.getAllLogs);
 router.get('/search', dailyLogsController.searchLogs);
 router.patch('/:id', dailyLogsController.updateLog);
 router.delete('/:id', dailyLogsController.deleteLog);

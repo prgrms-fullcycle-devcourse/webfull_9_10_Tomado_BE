@@ -24,10 +24,10 @@ function throwCode(code: string, message: string, field?: string): never {
     throw err;
 }
 
+/** 템플릿별 키는 모두 포함하고, 값은 문자열이면 빈 문자열도 허용 */
 function validateTemplateContent(
     templateType: TemplateType,
-    content: unknown,
-    opts?: { partial?: boolean }
+    content: unknown
 ): asserts content is Record<string, unknown> {
     if (content === null || typeof content !== 'object' || Array.isArray(content)) {
         throwCode('VALIDATION_ERROR', 'content는 객체여야 합니다.', 'content');
@@ -35,29 +35,11 @@ function validateTemplateContent(
 
     const obj = content as Record<string, unknown>;
     const requiredKeys = TEMPLATE_REQUIRED_KEYS[templateType];
-    const partial = opts?.partial === true;
-
-    if (partial) {
-        const missingKeys = requiredKeys.filter((k) => !(k in obj) || typeof obj[k] !== 'string');
-        if (missingKeys.length > 0) {
-            throwCode(
-                'VALIDATION_ERROR',
-                `${templateType} 템플릿의 항목은 모두 문자열 키로 포함되어야 합니다: ${missingKeys.join(', ')}`,
-                'content'
-            );
-        }
-        return;
-    }
-
-    const missingKeys = requiredKeys.filter((k) => {
-        const v = obj[k];
-        return typeof v !== 'string' || v.trim() === '';
-    });
-
+    const missingKeys = requiredKeys.filter((k) => !(k in obj) || typeof obj[k] !== 'string');
     if (missingKeys.length > 0) {
         throwCode(
             'VALIDATION_ERROR',
-            `${templateType} 템플릿의 필수 항목이 누락되었습니다: ${missingKeys.join(', ')}`,
+            `${templateType} 템플릿의 항목은 모두 문자열 키로 포함되어야 합니다: ${missingKeys.join(', ')}`,
             'content'
         );
     }
@@ -123,11 +105,9 @@ export async function createRetro(
         retro_date: string;
         template_type: unknown;
         content: unknown;
-        partial?: unknown;
     }
 ): Promise<ReturnType<typeof serializeRetroLog>> {
     const { daily_log_id, retro_date, template_type, content } = body;
-    const isPartial = body.partial === true;
 
     const normalizedDailyLogId =
         typeof daily_log_id === 'string' && daily_log_id.trim() !== '' ? daily_log_id.trim() : null;
@@ -142,10 +122,7 @@ export async function createRetro(
             'template_type'
         );
     }
-    if (body.partial !== undefined && body.partial !== false && body.partial !== true) {
-        throwCode('VALIDATION_ERROR', 'partial은 true 또는 false여야 합니다.', 'partial');
-    }
-    validateTemplateContent(template_type, content, { partial: isPartial });
+    validateTemplateContent(template_type, content);
 
     if (normalizedDailyLogId !== null) {
         const dailyLog = await retroRepo.findDailyLogOwnedByUser(normalizedDailyLogId, userId);
@@ -244,7 +221,7 @@ export async function listRetros(userId: string) {
 export async function updateRetro(
     userId: string,
     id: string,
-    body: { content?: unknown; is_dirty?: unknown; draft_content?: unknown; partial?: unknown }
+    body: { content?: unknown; is_dirty?: unknown; draft_content?: unknown }
 ): Promise<ReturnType<typeof serializeRetroLog>> {
     const row = await retroRepo.findRetroById(id);
     if (!row) {
@@ -256,10 +233,6 @@ export async function updateRetro(
     if (!isTemplateType(row.templateType)) {
         throwCode('VALIDATION_ERROR', '알 수 없는 template_type입니다.', 'template_type');
     }
-    if (body.partial !== undefined && body.partial !== false && body.partial !== true) {
-        throwCode('VALIDATION_ERROR', 'partial은 true 또는 false여야 합니다.', 'partial');
-    }
-    const isPartial = body.partial === true;
 
     const patch: {
         content?: Prisma.InputJsonValue;
@@ -268,7 +241,7 @@ export async function updateRetro(
     } = {};
 
     if (body.content !== undefined) {
-        validateTemplateContent(row.templateType, body.content, { partial: isPartial });
+        validateTemplateContent(row.templateType, body.content);
         patch.content = body.content as Prisma.InputJsonValue;
     }
     if (body.is_dirty !== undefined) {

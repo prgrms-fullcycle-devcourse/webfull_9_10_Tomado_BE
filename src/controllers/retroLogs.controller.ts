@@ -92,7 +92,6 @@ export const updateRetro = async (req: Request, res: Response, next: NextFunctio
             content: req.body?.content,
             is_dirty: req.body?.is_dirty,
             draft_content: req.body?.draft_content,
-            partial: req.body?.partial,
         });
         res.status(200).json(result);
     } catch (err) {

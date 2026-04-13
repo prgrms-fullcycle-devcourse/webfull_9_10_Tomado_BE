@@ -81,32 +81,10 @@ export const getLogsPaginated = async (userId: string, page: number, limit: numb
     };
 };
 
-// 검색 및 미리보기 가공
+// 검색 및 가공
 export const searchLogs = async (userId: string, query: string) => {
     const logs = await dailyLogsRepository.searchDailyLogs(userId, query);
-
-    return logs.map((log) => {
-        const content = log.content ?? '';
-        const index = content.toLowerCase().indexOf(query.toLowerCase());
-
-        let preview = '';
-        if (index !== -1) {
-            const start = Math.max(0, index - 25);
-            const end = Math.min(content.length, index + 25);
-            preview = (start > 0 ? '...' : '') + content.substring(start, end) + (end < content.length ? '...' : '');
-        } else {
-            preview = content.substring(0, 50) + (content.length > 50 ? '...' : '');
-        }
-
-        return {
-            id: log.id,
-            log_date: toIsoDateInSeoul(log.logDate),
-            title: log.title,
-            content_preview: preview,
-            tags: log.tags,
-            has_retro_log: log.retroLogs ? log.retroLogs.length > 0 : false,
-        };
-    });
+    return logs.map(mapToSummary);
 };
 
 // 로그 수정

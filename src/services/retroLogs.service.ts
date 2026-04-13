@@ -24,6 +24,7 @@ function throwCode(code: string, message: string, field?: string): never {
     throw err;
 }
 
+/** 템플릿별 키는 모두 포함하고, 값은 문자열이면 빈 문자열도 허용 */
 function validateTemplateContent(
     templateType: TemplateType,
     content: unknown
@@ -32,16 +33,13 @@ function validateTemplateContent(
         throwCode('VALIDATION_ERROR', 'content는 객체여야 합니다.', 'content');
     }
 
+    const obj = content as Record<string, unknown>;
     const requiredKeys = TEMPLATE_REQUIRED_KEYS[templateType];
-    const missingKeys = requiredKeys.filter((k) => {
-        const v = (content as Record<string, unknown>)[k];
-        return typeof v !== 'string' || v.trim() === '';
-    });
-
+    const missingKeys = requiredKeys.filter((k) => !(k in obj) || typeof obj[k] !== 'string');
     if (missingKeys.length > 0) {
         throwCode(
             'VALIDATION_ERROR',
-            `${templateType} 템플릿의 필수 항목이 누락되었습니다: ${missingKeys.join(', ')}`,
+            `${templateType} 템플릿의 항목은 모두 문자열 키로 포함되어야 합니다: ${missingKeys.join(', ')}`,
             'content'
         );
     }

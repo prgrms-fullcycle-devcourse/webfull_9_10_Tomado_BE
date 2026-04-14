@@ -137,9 +137,36 @@ export async function findRetrosByIds(userId: string, ids: string[]): Promise<Re
     });
 }
 
-export async function findRetroListRowsByUser(userId: string): Promise<RetroLog[]> {
-    return prisma.retroLog.findMany({
+export async function countDistinctRetroDatesByUser(userId: string): Promise<number> {
+    const rows = await prisma.$queryRaw<{ count: bigint | number | string }[]>(Prisma.sql`
+    SELECT COUNT(DISTINCT retro_date) AS count
+    FROM retro_logs
+    WHERE user_id = ${userId}::uuid
+  `);
+
+    const value = rows[0]?.count;
+    if (typeof value === 'bigint') return Number(value);
+    if (typeof value === 'number') return value;
+    if (typeof value === 'string') return Number(value);
+    return 0;
+}
+
+export async function findRetroDatesByUser(userId: string, skip: number, take: number): Promise<Date[]> {
+    const rows = await prisma.retroLog.groupBy({
+        by: ['retroDate'],
         where: { userId },
+        orderBy: { retroDate: 'desc' },
+        skip,
+        take,
+    });
+    return rows.map((row) => row.retroDate);
+}
+
+export async function findRetroListRowsByUserAndDates(userId: string, retroDates: Date[]): Promise<RetroLog[]> {
+    if (retroDates.length === 0) return [];
+
+    return prisma.retroLog.findMany({
+        where: { userId, retroDate: { in: retroDates } },
         orderBy: [{ retroDate: 'desc' }, { createdAt: 'desc' }],
     });
 }

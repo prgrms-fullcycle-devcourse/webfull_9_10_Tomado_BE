@@ -78,7 +78,9 @@ export const searchRetros = async (req: Request, res: Response, next: NextFuncti
 
 export const listRetros = async (req: Request, res: Response, next: NextFunction) => {
     try {
-        const result = await retroLogsService.listRetros(res.locals.authUserId as string);
+        const page = typeof req.query.page === 'string' ? Number(req.query.page) : undefined;
+        const page_size = typeof req.query.page_size === 'string' ? Number(req.query.page_size) : undefined;
+        const result = await retroLogsService.listRetros(res.locals.authUserId as string, { page, page_size });
         res.status(200).json(result);
     } catch (err) {
         if (sendServiceError(res, err)) return;

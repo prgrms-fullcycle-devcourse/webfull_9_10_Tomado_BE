@@ -60,17 +60,45 @@ export function serializeRetroLog(row: RetroLog) {
     };
 }
 
-/** content JSON에서 검색어 주변 미리보기 (앞뒤 최대 50자) */
-export function buildContentPreview(content: unknown, q: string): string {
-    const text = typeof content === 'object' && content !== null ? JSON.stringify(content) : String(content);
+/** content JSON에서 값을 추출하여 검색어 주변 미리보기 (앞뒤 최대 20자) */
+export function buildContentPreview(content: unknown, q: string, templateType?: string): string {
+    let text = '';
+    if (content && typeof content === 'object' && !Array.isArray(content)) {
+        const obj = content as Record<string, unknown>;
+
+        // 템플릿 타입이 유효하면 정해진 순서대로 값 추출, 아니면 기본값 추출
+        if (templateType && isTemplateType(templateType)) {
+            const keys = TEMPLATE_REQUIRED_KEYS[templateType];
+            text = keys
+                .map((k) => obj[k])
+                .filter((v): v is string => typeof v === 'string')
+                .join(' ');
+        } else {
+            text = Object.values(obj)
+                .filter((v) => typeof v === 'string')
+                .join(' ');
+        }
+    } else {
+        text = String(content);
+    }
+
     const lower = text.toLowerCase();
     const qi = lower.indexOf(q.toLowerCase());
+
+    // 검색어가 없거나(키값만 매칭된 경우 등) 찾지 못한 경우 처음부터 40자 출력
     if (qi === -1) {
-        return text.slice(0, 100);
+        return text.length > 40 ? text.slice(0, 40) + '...' : text;
     }
-    const start = Math.max(0, qi - 50);
-    const end = Math.min(text.length, qi + q.length + 50);
-    return text.slice(start, end);
+
+    // 검색어 기준 앞뒤 약 20자 추출
+    const start = Math.max(0, qi - 20);
+    const end = Math.min(text.length, qi + q.length + 20);
+
+    let result = text.slice(start, end);
+    if (start > 0) result = '...' + result;
+    if (end < text.length) result = result + '...';
+
+    return result;
 }
 
 export async function getRetro(
@@ -171,7 +199,7 @@ export async function searchRetros(userId: string, q: string) {
         daily_log_id: row.dailyLogId,
         retro_date: retroRepo.toIsoDate(row.retroDate),
         template_type: row.templateType,
-        content_preview: buildContentPreview(row.content, q),
+        content_preview: buildContentPreview(row.content, q, row.templateType),
     }));
 }
 

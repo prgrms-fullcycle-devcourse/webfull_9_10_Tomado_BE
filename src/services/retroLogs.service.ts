@@ -175,8 +175,21 @@ export async function searchRetros(userId: string, q: string) {
     }));
 }
 
-export async function listRetros(userId: string) {
-    const rows = await retroRepo.findRetroListRowsByUser(userId);
+export async function listRetros(userId: string, query: { page?: number; page_size?: number }) {
+    const page = query.page ?? 1;
+    const pageSize = query.page_size ?? 10;
+
+    if (!Number.isInteger(page) || page < 1) {
+        throwCode('VALIDATION_ERROR', 'page는 1 이상의 정수여야 합니다.', 'page');
+    }
+    if (!Number.isInteger(pageSize) || pageSize < 1 || pageSize > 100) {
+        throwCode('VALIDATION_ERROR', 'page_size는 1~100 범위의 정수여야 합니다.', 'page_size');
+    }
+
+    const skip = (page - 1) * pageSize;
+    const totalCount = await retroRepo.countDistinctRetroDatesByUser(userId);
+    const retroDates = await retroRepo.findRetroDatesByUser(userId, skip, pageSize);
+    const rows = await retroRepo.findRetroListRowsByUserAndDates(userId, retroDates);
     const byDate = new Map<
         string,
         {
@@ -215,7 +228,17 @@ export async function listRetros(userId: string) {
         }
     }
 
-    return Array.from(byDate.values());
+    const items = Array.from(byDate.values());
+    const totalPages = Math.ceil(totalCount / pageSize);
+
+    return {
+        items,
+        page,
+        page_size: pageSize,
+        total_count: totalCount,
+        total_pages: totalPages,
+        has_next: page < totalPages,
+    };
 }
 
 export async function updateRetro(
